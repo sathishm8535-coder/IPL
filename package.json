@@ -1,19 +1,17 @@
 {
-  "name": "ipl-auction",
+  "name": "ipl-auction-root",
   "version": "1.0.0",
-  "description": "",
-  "main": "Ipl.js",
+  "description": "IPL Auction Game",
+  "main": "Backend/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "build": "cd Backend && npm install",
+    "start": "cd Backend && npm start",
+    "dev": "cd Frontend && npm install && npm start",
+    "backend": "cd Backend && node server.js",
+    "frontend": "cd Frontend && npx http-server -p 3001",
+    "install-all": "cd Backend && npm install && cd ../Frontend && npm install"
   },
-  "keywords": [],
+  "keywords": ["ipl", "auction", "game"],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "express": "^5.2.1",
-    "firebase": "^12.6.0",
-    "socket.io": "^4.8.1"
-  }
+  "license": "ISC"
 }
