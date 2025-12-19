@@ -2903,11 +2903,11 @@ function startAuction() {
         : `Friend ${i + 1}`;
     const teamName = teamSel ? teamSel.value : null;
     if (!teamName) {
-      alert("Select team for all friends");
+      showNotification("Select team for all friends", 'error');
       return;
     }
     if (selectedTeams.includes(teamName)) {
-      alert(`${teamName} already selected — choose different IPL teams`);
+      showNotification(`${teamName} already selected — choose different IPL teams`, 'error');
       return;
     }
     selectedTeams.push(teamName);
@@ -2931,6 +2931,14 @@ function startAuction() {
     });
   }
 
+  // Send auction start to other players if in multiplayer mode
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('startAuction', {
+      roomId: currentRoomId,
+      teams: teams
+    });
+  }
+
   // hide selection and show auction
   document.getElementById("team-selection").style.display = "none";
   auctionBlock.style.display = "grid";
@@ -2939,6 +2947,8 @@ function startAuction() {
   updateTeamsView();
   currentPlayerIndex = 0;
   loadPlayer();
+  
+  showNotification('Auction Started!', 'success');
 }
 
 /* ====== Populate bid buttons with avatar & friend name ====== */
@@ -3027,22 +3037,25 @@ function bidNow(idx) {
 
   // validations
   if (t.budget < currentPrice + priceIncrement) {
-    alert(
+    showNotification(
       `${t.friendName} does not have enough budget (₹${
         t.budget
-      } Cr) for next bid (₹${currentPrice + priceIncrement} Cr)`
+      } Cr) for next bid (₹${currentPrice + priceIncrement} Cr)`,
+      'error'
     );
     return;
   }
   if (p.foreign && t.foreignCount >= MAX_FOREIGN_PER_TEAM) {
-    alert(
-      `${t.friendName} (${t.teamName}) already has ${MAX_FOREIGN_PER_TEAM} foreign players`
+    showNotification(
+      `${t.friendName} (${t.teamName}) already has ${MAX_FOREIGN_PER_TEAM} foreign players`,
+      'error'
     );
     return;
   }
   if (t.players.length >= MAX_PLAYERS_PER_TEAM) {
-    alert(
-      `${t.friendName} (${t.teamName}) already has ${MAX_PLAYERS_PER_TEAM} players`
+    showNotification(
+      `${t.friendName} (${t.teamName}) already has ${MAX_PLAYERS_PER_TEAM} players`,
+      'error'
     );
     return;
   }
@@ -3057,6 +3070,16 @@ function bidNow(idx) {
   countdown = NO_BID_SECONDS;
   timerEl.textContent = `${countdown}s`;
   startCountdownIfNeeded();
+
+  // Send bid to other players if in multiplayer mode
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('placeBid', {
+      roomId: currentRoomId,
+      bidAmount: currentPrice,
+      teamIndex: idx,
+      playerName: `${t.friendName} (${t.teamName})`
+    });
+  }
 }
 
 /* ====== Decline (skip) ====== */
@@ -3120,11 +3143,19 @@ function assignPlayer(skipped = false) {
   currentPlayerIndex++;
   updateTeamsView();
 
+  // Send next player event in multiplayer mode
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('nextPlayer', {
+      roomId: currentRoomId,
+      playerIndex: currentPlayerIndex
+    });
+  }
+
   setTimeout(() => {
     if (currentPlayerIndex < players.length) {
       loadPlayer();
     } else {
-      alert("Auction completed for all players in the list.");
+      showNotification("Auction completed for all players in the list.", 'success');
       if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
@@ -3145,7 +3176,7 @@ function assignPlayer(skipped = false) {
 /* ====== Skip current player from History (Next Player action) ====== */
 function skipCurrentPlayer() {
   if (currentPlayerIndex >= players.length) {
-    alert("No more players to skip.");
+    showNotification("No more players to skip.", 'info');
     return;
   }
   const p = players[currentPlayerIndex];
@@ -3159,11 +3190,20 @@ function skipCurrentPlayer() {
   }
   highestBidderIdx = -1;
   currentPlayerIndex++;
+  
+  // Send next player event in multiplayer mode
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('nextPlayer', {
+      roomId: currentRoomId,
+      playerIndex: currentPlayerIndex
+    });
+  }
+  
   updateTeamsView();
   if (currentPlayerIndex < players.length) {
     loadPlayer();
   } else {
-    alert("Auction completed for all players in the list.");
+    showNotification("Auction completed for all players in the list.", 'success');
     highestBidderEl.textContent = "-";
     timerEl.textContent = "0s";
     
@@ -3393,15 +3433,146 @@ function viewSquads() {
   });
 }
 
-// Multiplayer Room JS (thani file or Ipl.js end-la)
+// Multiplayer functionality
+let socket = null;
+let currentRoomId = null;
+let isMultiplayer = false;
+let playerData = null;
 
-// Connect to Socket.IO server
-const socket = io("https://ipl-cca1.onrender.com");
+// Initialize socket connection
+function initializeSocket() {
+  // Try to connect to deployed server first, fallback to localhost
+  const serverUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000' 
+    : 'https://ipl-cca1.onrender.com';
+  
+  socket = io(serverUrl, {
+    transports: ['websocket', 'polling'],
+    timeout: 20000,
+    forceNew: true
+  });
 
-// Connection log
-socket.on("connect", () => {
-  console.log("Connected:", socket.id);
-});
+  socket.on('connect', () => {
+    console.log('Connected to server:', socket.id);
+    updateConnectionStatus(true);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+    updateConnectionStatus(false);
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('Connection error:', error);
+    updateConnectionStatus(false);
+  });
+
+  setupSocketListeners();
+}
+
+function updateConnectionStatus(connected) {
+  const statusEl = document.getElementById('connectionStatus');
+  if (!statusEl) {
+    const status = document.createElement('div');
+    status.id = 'connectionStatus';
+    status.style.cssText = 'position:fixed;top:10px;right:10px;padding:5px 10px;border-radius:5px;font-size:12px;z-index:1000';
+    document.body.appendChild(status);
+  }
+  const statusElement = document.getElementById('connectionStatus');
+  if (connected) {
+    statusElement.textContent = '🟢 Connected';
+    statusElement.style.backgroundColor = '#4CAF50';
+    statusElement.style.color = 'white';
+  } else {
+    statusElement.textContent = '🔴 Disconnected';
+    statusElement.style.backgroundColor = '#f44336';
+    statusElement.style.color = 'white';
+  }
+}
+
+function setupSocketListeners() {
+  socket.on('roomCreated', (roomId) => {
+    console.log('Room created:', roomId);
+    currentRoomId = roomId;
+    document.getElementById('roomId').value = roomId;
+    showNotification(`Room Created: ${roomId}`, 'success');
+    isMultiplayer = true;
+  });
+
+  socket.on('joinedRoom', (data) => {
+    console.log('Joined room:', data);
+    currentRoomId = data.roomId;
+    showNotification(`Joined Room: ${data.roomId}`, 'success');
+    isMultiplayer = true;
+  });
+
+  socket.on('joinError', (error) => {
+    showNotification(`Join Error: ${error}`, 'error');
+  });
+
+  socket.on('playerJoined', (data) => {
+    showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
+  });
+
+  socket.on('playerLeft', (data) => {
+    showNotification(`Player left the room`, 'info');
+  });
+
+  socket.on('auctionStarted', (data) => {
+    console.log('Auction started:', data);
+    // Sync teams and game state
+    if (data.teams) {
+      teams = data.teams;
+      updateTeamsView();
+    }
+  });
+
+  socket.on('bidPlaced', (data) => {
+    console.log('Bid received:', data);
+    // Update UI with new bid
+    currentPrice = data.bidAmount;
+    highestBidderIdx = data.teamIndex;
+    currentPriceEl.textContent = currentPrice;
+    highestBidderEl.textContent = data.playerName;
+    
+    // Reset timer
+    countdown = NO_BID_SECONDS;
+    timerEl.textContent = `${countdown}s`;
+    startCountdownIfNeeded();
+    
+    showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
+  });
+
+  socket.on('playerChanged', (data) => {
+    console.log('Player changed:', data);
+    // Move to next player
+    currentPlayerIndex = data.gameState.currentPlayerIndex;
+    if (currentPlayerIndex < players.length) {
+      loadPlayer();
+    }
+  });
+
+  socket.on('gameStateUpdated', (gameState) => {
+    console.log('Game state updated:', gameState);
+    // Sync game state
+    if (gameState.currentPlayerIndex !== undefined) {
+      currentPlayerIndex = gameState.currentPlayerIndex;
+    }
+    if (gameState.currentPrice !== undefined) {
+      currentPrice = gameState.currentPrice;
+      currentPriceEl.textContent = currentPrice;
+    }
+  });
+}
+
+// Get user info and initialize socket
+function initializeMultiplayer() {
+  const userInfo = localStorage.getItem('userInfo');
+  if (userInfo) {
+    playerData = JSON.parse(userInfo);
+    initializeSocket();
+  }
+}
 
 // Get buttons & input
 const createBtn = document.getElementById("createRoom");
@@ -3409,32 +3580,89 @@ const joinBtn = document.getElementById("joinRoom");
 const roomInput = document.getElementById("roomId");
 
 // Create Room button click
-createBtn.addEventListener("click", () => {
-  socket.emit("createRoom"); // server-la room create event send
-});
-
-// Listen for room created confirmation from server
-socket.on("roomCreated", (roomId) => {
-  console.log("Room created:", roomId);
-  alert("Room Created: " + roomId); // optional, show to user
-  roomInput.value = roomId; // fill input with created room id
-});
+if (createBtn) {
+  createBtn.addEventListener("click", () => {
+    if (!socket || !socket.connected) {
+      showNotification('Not connected to server. Please refresh and try again.', 'error');
+      return;
+    }
+    
+    const userData = {
+      name: playerData?.name || 'Anonymous',
+      email: playerData?.email || '',
+      uid: playerData?.uid || socket.id
+    };
+    
+    socket.emit("createRoom", userData);
+  });
+}
 
 // Join Room button click
-joinBtn.addEventListener("click", () => {
-  const id = roomInput.value.trim();
-  if (!id) {
-    alert("Enter a Room ID to join!");
-    return;
-  }
-  socket.emit("joinRoom", id); // server-la join request
-  console.log("Joining Room:", id);
-});
+if (joinBtn) {
+  joinBtn.addEventListener("click", () => {
+    const id = roomInput.value.trim();
+    if (!id) {
+      showNotification('Enter a Room ID to join!', 'error');
+      return;
+    }
+    
+    if (!socket || !socket.connected) {
+      showNotification('Not connected to server. Please refresh and try again.', 'error');
+      return;
+    }
+    
+    const userData = {
+      name: playerData?.name || 'Anonymous',
+      email: playerData?.email || '',
+      uid: playerData?.uid || socket.id
+    };
+    
+    socket.emit("joinRoom", { roomId: id, userData });
+  });
+}
 
-// Optional: listen for server confirmation
-socket.on("joinedRoom", (roomId) => {
-  console.log("Joined Room:", roomId);
-  alert("Joined Room: " + roomId);
+// Notification system
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 1001;
+    max-width: 300px;
+    word-wrap: break-word;
+  `;
+  
+  switch(type) {
+    case 'success':
+      notification.style.backgroundColor = '#4CAF50';
+      break;
+    case 'error':
+      notification.style.backgroundColor = '#f44336';
+      break;
+    case 'info':
+    default:
+      notification.style.backgroundColor = '#2196F3';
+      break;
+  }
+  
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
+}
+
+// Initialize multiplayer when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initializeMultiplayer, 1000);
 });
 
 

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
     <title> IPL Auction </title>
     <link rel="icon" type="image/jpeg" href="assets/icon.jpg">
     <link rel="stylesheet" href="css/IpL.css">
@@ -57,9 +57,12 @@
 
                 <!-- Multiplayer Room Controls -->
                 <div id="multiplayerControls">
-                    <button id="createRoom">Create Room</button>
-                    <input id="roomId" placeholder="Enter Room ID">
-                    <button id="joinRoom">Join Room</button>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                        <button id="createRoom" style="background:#4CAF50;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer">Create Room</button>
+                        <input id="roomId" placeholder="Enter Room ID" style="padding:8px;border:1px solid #ccc;border-radius:5px;min-width:120px">
+                        <button id="joinRoom" style="background:#2196F3;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer">Join Room</button>
+                    </div>
+                    <div id="roomStatus" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
                 </div>
 
 
@@ -197,7 +200,20 @@
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 
     <script src="js/fix-paths.js"></script>
     <script src="js/Ipl.js"></script>

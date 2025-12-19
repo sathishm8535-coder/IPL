@@ -48,41 +48,113 @@ const rooms = new Map();
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('createRoom', () => {
+  socket.on('createRoom', (userData) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     rooms.set(roomId, {
       id: roomId,
-      players: [socket.id],
-      gameState: {},
+      players: [{ socketId: socket.id, ...userData }],
+      gameState: {
+        currentPlayerIndex: 0,
+        currentPrice: 0,
+        highestBidder: null,
+        timer: 10,
+        isActive: false
+      },
+      teams: [],
       currentBid: null
     });
     socket.join(roomId);
     socket.emit('roomCreated', roomId);
+    console.log(`Room ${roomId} created by ${socket.id}`);
   });
 
-  socket.on('joinRoom', (roomId) => {
+  socket.on('joinRoom', (data) => {
+    const { roomId, userData } = data;
     const room = rooms.get(roomId);
     if (room && room.players.length < 10) {
-      room.players.push(socket.id);
+      room.players.push({ socketId: socket.id, ...userData });
       socket.join(roomId);
-      socket.emit('joinedRoom', roomId);
-      io.to(roomId).emit('playerJoined', { playerId: socket.id, playerCount: room.players.length });
+      socket.emit('joinedRoom', { roomId, players: room.players });
+      socket.to(roomId).emit('playerJoined', { 
+        playerId: socket.id, 
+        playerCount: room.players.length,
+        newPlayer: userData
+      });
+      console.log(`Player ${socket.id} joined room ${roomId}`);
     } else {
       socket.emit('joinError', 'Room not found or full');
     }
   });
 
-  socket.on('placeBid', (data) => {
-    const { roomId, bidAmount, playerId } = data;
+  socket.on('startAuction', (data) => {
+    const { roomId, teams } = data;
     const room = rooms.get(roomId);
     if (room) {
-      room.currentBid = { playerId, bidAmount, timestamp: Date.now() };
-      io.to(roomId).emit('bidPlaced', room.currentBid);
+      room.teams = teams;
+      room.gameState.isActive = true;
+      io.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
+      console.log(`Auction started in room ${roomId}`);
+    }
+  });
+
+  socket.on('placeBid', (data) => {
+    const { roomId, bidAmount, teamIndex, playerName } = data;
+    const room = rooms.get(roomId);
+    if (room && room.gameState.isActive) {
+      room.gameState.currentPrice = bidAmount;
+      room.gameState.highestBidder = { teamIndex, playerName };
+      room.gameState.timer = 10; // Reset timer
+      room.currentBid = { teamIndex, bidAmount, playerName, timestamp: Date.now() };
+      io.to(roomId).emit('bidPlaced', {
+        bidAmount,
+        teamIndex,
+        playerName,
+        gameState: room.gameState
+      });
+      console.log(`Bid placed in room ${roomId}: ${bidAmount} by ${playerName}`);
+    }
+  });
+
+  socket.on('nextPlayer', (data) => {
+    const { roomId } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      room.gameState.currentPlayerIndex++;
+      room.gameState.currentPrice = 0;
+      room.gameState.highestBidder = null;
+      room.gameState.timer = 10;
+      io.to(roomId).emit('playerChanged', { gameState: room.gameState });
+      console.log(`Next player in room ${roomId}`);
+    }
+  });
+
+  socket.on('syncGameState', (data) => {
+    const { roomId, gameState } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      room.gameState = { ...room.gameState, ...gameState };
+      socket.to(roomId).emit('gameStateUpdated', room.gameState);
     }
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    // Remove player from all rooms
+    for (const [roomId, room] of rooms.entries()) {
+      const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
+      if (playerIndex !== -1) {
+        room.players.splice(playerIndex, 1);
+        socket.to(roomId).emit('playerLeft', { 
+          playerId: socket.id, 
+          playerCount: room.players.length 
+        });
+        if (room.players.length === 0) {
+          rooms.delete(roomId);
+          console.log(`Room ${roomId} deleted - no players left`);
+        }
+        break;
+      }
+    }
   });
 });
 

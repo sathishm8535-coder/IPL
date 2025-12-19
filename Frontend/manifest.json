@@ -1,22 +1,27 @@
 {
   "name": "IPL Auction Game",
   "short_name": "IPL Auction",
-  "description": "Multiplayer IPL Auction Game",
-  "start_url": "/",
+  "description": "Multiplayer IPL Player Auction Game",
+  "start_url": "/login.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#071026",
   "theme_color": "#ff8c00",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "assets/icon.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "assets/icon.jpg",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["games", "sports"],
+  "lang": "en",
+  "scope": "/"
 }
