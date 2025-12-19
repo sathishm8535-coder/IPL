@@ -90,26 +90,36 @@ io.on('connection', (socket) => {
       return;
     }
     
-    const room = rooms.get(roomId.toUpperCase());
-    if (room && room.players.length < 10) {
+    const upperRoomId = roomId.toUpperCase();
+    const room = rooms.get(upperRoomId);
+    
+    if (room) {
+      if (room.players.length >= 10) {
+        socket.emit('joinError', 'Room is full (max 10 players)');
+        console.log(`Join failed for ${socket.id}: Room ${upperRoomId} is full`);
+        return;
+      }
+      
       // Check if player already in room
       const existingPlayer = room.players.find(p => p.socketId === socket.id);
       if (!existingPlayer) {
         room.players.push({ socketId: socket.id, ...userData });
       }
-      socket.join(roomId);
-      socket.emit('joinedRoom', { roomId, players: room.players });
-      // Broadcast to all players in room including sender
-      io.to(roomId).emit('playerJoined', { 
+      
+      socket.join(upperRoomId);
+      socket.emit('joinedRoom', { roomId: upperRoomId, players: room.players });
+      
+      // Broadcast to all players in room
+      io.to(upperRoomId).emit('playerJoined', { 
         playerId: socket.id, 
         playerCount: room.players.length,
         newPlayer: userData
       });
-      console.log(`Player ${socket.id} joined room ${roomId}. Total players: ${room.players.length}`);
+      
+      console.log(`Player ${socket.id} joined room ${upperRoomId}. Total players: ${room.players.length}`);
     } else {
-      const errorMsg = room ? 'Room is full (max 10 players)' : 'Room not found';
-      socket.emit('joinError', errorMsg);
-      console.log(`Join failed for ${socket.id}: ${errorMsg}. Room exists: ${!!room}`);
+      socket.emit('joinError', `Room ${upperRoomId} not found. Please check the Room ID.`);
+      console.log(`Join failed for ${socket.id}: Room ${upperRoomId} does not exist`);
     }
   });
 
