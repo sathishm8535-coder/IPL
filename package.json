@@ -1,17 +1,20 @@
 {
-  "name": "ipl-auction-root",
+  "name": "ipl-auction-backend",
   "version": "1.0.0",
-  "description": "IPL Auction Game",
-  "main": "Backend/server.js",
+  "description": "IPL Auction Multiplayer Backend",
+  "main": "server.js",
   "scripts": {
-    "build": "cd Backend && npm install",
-    "start": "cd Backend && npm start",
-    "dev": "cd Frontend && npm install && npm start",
-    "backend": "cd Backend && node server.js",
-    "frontend": "cd Frontend && npx http-server -p 3001",
-    "install-all": "cd Backend && npm install && cd ../Frontend && npm install"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step required'"
   },
-  "keywords": ["ipl", "auction", "game"],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.22.1",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
