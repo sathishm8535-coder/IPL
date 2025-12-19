@@ -3478,6 +3478,17 @@ function initializeSocket() {
   socket.on('connect_error', (error) => {
     console.error('Connection error:', error);
     updateConnectionStatus(false);
+    showNotification('Connection failed. Please check server and try again.', 'error');
+  });
+
+  socket.on('reconnect', () => {
+    console.log('Reconnected to server');
+    updateConnectionStatus(true);
+    showNotification('Reconnected to server!', 'success');
+  });
+
+  socket.on('reconnect_error', () => {
+    showNotification('Reconnection failed. Please refresh page.', 'error');
   });
 
   setupSocketListeners();
@@ -3695,6 +3706,11 @@ if (joinBtn) {
     if (!socket.connected) {
       showNotification('Not connected to server. Trying to reconnect...', 'error');
       socket.connect();
+      setTimeout(() => {
+        if (!socket.connected) {
+          showNotification('Failed to reconnect. Please refresh page.', 'error');
+        }
+      }, 3000);
       return;
     }
     
