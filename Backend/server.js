@@ -54,7 +54,12 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('createRoom', (userData) => {
-    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Generate unique room ID
+    let roomId;
+    do {
+      roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    } while (rooms.has(roomId));
+    
     const roomData = {
       id: roomId,
       players: [{ socketId: socket.id, ...userData }],
@@ -67,7 +72,8 @@ io.on('connection', (socket) => {
       },
       teams: [],
       currentBid: null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      host: socket.id
     };
     rooms.set(roomId, roomData);
     socket.join(roomId);
@@ -80,15 +86,20 @@ io.on('connection', (socket) => {
     console.log(`Join attempt - Room: ${roomId}, Available rooms:`, Array.from(rooms.keys()));
     const room = rooms.get(roomId);
     if (room && room.players.length < 10) {
-      room.players.push({ socketId: socket.id, ...userData });
+      // Check if player already in room
+      const existingPlayer = room.players.find(p => p.socketId === socket.id);
+      if (!existingPlayer) {
+        room.players.push({ socketId: socket.id, ...userData });
+      }
       socket.join(roomId);
       socket.emit('joinedRoom', { roomId, players: room.players });
-      socket.to(roomId).emit('playerJoined', { 
+      // Broadcast to all players in room including sender
+      io.to(roomId).emit('playerJoined', { 
         playerId: socket.id, 
         playerCount: room.players.length,
         newPlayer: userData
       });
-      console.log(`Player ${socket.id} joined room ${roomId}`);
+      console.log(`Player ${socket.id} joined room ${roomId}. Total players: ${room.players.length}`);
     } else {
       const errorMsg = room ? 'Room is full (max 10 players)' : 'Room not found';
       socket.emit('joinError', errorMsg);

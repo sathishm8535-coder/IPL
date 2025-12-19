@@ -3532,8 +3532,13 @@ function setupSocketListeners() {
   });
 
   socket.on('playerJoined', (data) => {
-    document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} players connected`;
-    showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
+    if (currentRoomId) {
+      document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} player(s) connected`;
+      document.getElementById('roomStatus').style.color = '#4CAF50';
+      if (data.playerId !== socket.id) {
+        showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
+      }
+    }
   });
 
   socket.on('playerLeft', (data) => {
