@@ -3396,7 +3396,7 @@ function viewSquads() {
 // Multiplayer Room JS (thani file or Ipl.js end-la)
 
 // Connect to Socket.IO server
-const socket = io("http://localhost:3000");
+const socket = io("https://ipl-cca1.onrender.com");
 
 // Connection log
 socket.on("connect", () => {

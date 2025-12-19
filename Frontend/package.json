@@ -4,8 +4,8 @@
   "description": "IPL Auction Frontend",
   "main": "index.html",
   "scripts": {
-    "start": "node simple-server.js",
-    "dev": "node simple-server.js",
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx live-server --port=3000",
     "debug": "node simple-server.js"
   },
   "dependencies": {
