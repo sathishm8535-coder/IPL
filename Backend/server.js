@@ -84,7 +84,13 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     const { roomId, userData } = data;
     console.log(`Join attempt - Room: ${roomId}, Available rooms:`, Array.from(rooms.keys()));
-    const room = rooms.get(roomId);
+    
+    if (!roomId || typeof roomId !== 'string') {
+      socket.emit('joinError', 'Invalid room ID');
+      return;
+    }
+    
+    const room = rooms.get(roomId.toUpperCase());
     if (room && room.players.length < 10) {
       // Check if player already in room
       const existingPlayer = room.players.find(p => p.socketId === socket.id);

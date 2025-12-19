@@ -3524,9 +3524,15 @@ function setupSocketListeners() {
 
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
-    document.getElementById('roomStatus').textContent = `Failed to join room: ${error}`;
-    document.getElementById('roomStatus').style.color = '#f44336';
+    const statusEl = document.getElementById('roomStatus');
+    if (statusEl) {
+      statusEl.textContent = `Failed to join room: ${error}`;
+      statusEl.style.color = '#f44336';
+    }
     showNotification(`Join Error: ${error}`, 'error');
+    // Clear room input on error
+    const roomInput = document.getElementById('roomId');
+    if (roomInput) roomInput.value = '';
   });
 
   socket.on('playerJoined', (data) => {
