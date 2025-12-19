@@ -3155,27 +3155,17 @@ function assignPlayer(skipped = false) {
     });
   }
 
-  // Auto move to next player
-  setTimeout(() => {
-    if (currentPlayerIndex < players.length) {
-      loadPlayer();
-    } else {
-      showNotification("Auction completed for all players in the list.", 'success');
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+  // Auto move to next player (only in single player mode)
+  if (!isMultiplayer) {
+    setTimeout(() => {
+      if (currentPlayerIndex < players.length) {
+        loadPlayer();
+      } else {
+        showNotification("Auction completed for all players in the list.", 'success');
+        showResult();
       }
-      highestBidderEl.textContent = "-";
-      timerEl.textContent = "0s";
-      
-      // Auto show final results when auction ends
-      showResult();
-      const showWinnerBtn = document.getElementById("showWinnerBtn");
-      if (showWinnerBtn) {
-        showWinnerBtn.style.display = "inline-block";
-      }
-    }
-  }, 1000);
+    }, 1000);
+  }
 }
 
 /* ====== Skip current player from History (Next Player action) ====== */

@@ -83,55 +83,52 @@ io.on('connection', (socket) => {
 
   socket.on('joinRoom', (data) => {
     const { roomId, userData } = data;
-    console.log(`Join attempt - Room: ${roomId}, Available rooms:`, Array.from(rooms.keys()));
-    console.log(`Room data received:`, data);
+    console.log(`\n=== JOIN ROOM DEBUG ===`);
+    console.log(`Socket ID: ${socket.id}`);
+    console.log(`Requested Room ID: '${roomId}'`);
+    console.log(`Available rooms:`, Array.from(rooms.keys()));
+    console.log(`Room count: ${rooms.size}`);
     
-    if (!roomId || typeof roomId !== 'string') {
-      socket.emit('joinError', 'Invalid room ID');
+    if (!roomId) {
+      socket.emit('joinError', 'Room ID is required');
       return;
     }
     
-    const upperRoomId = roomId.toUpperCase().trim();
-    console.log(`Looking for room: ${upperRoomId}`);
+    const cleanRoomId = String(roomId).toUpperCase().trim();
+    console.log(`Clean Room ID: '${cleanRoomId}'`);
     
-    // Check all rooms with exact match
-    let room = null;
-    for (const [key, value] of rooms.entries()) {
-      console.log(`Checking room key: '${key}' against '${upperRoomId}'`);
-      if (key === upperRoomId) {
-        room = value;
-        break;
-      }
-    }
+    const room = rooms.get(cleanRoomId);
+    console.log(`Room found: ${!!room}`);
     
     if (room) {
+      console.log(`Room players: ${room.players.length}`);
+      
       if (room.players.length >= 10) {
-        socket.emit('joinError', 'Room is full (max 10 players)');
-        console.log(`Join failed for ${socket.id}: Room ${upperRoomId} is full`);
+        socket.emit('joinError', 'Room is full');
         return;
       }
       
-      // Check if player already in room
       const existingPlayer = room.players.find(p => p.socketId === socket.id);
       if (!existingPlayer) {
         room.players.push({ socketId: socket.id, ...userData });
+        console.log(`Added player to room. New count: ${room.players.length}`);
       }
       
-      socket.join(upperRoomId);
-      socket.emit('joinedRoom', { roomId: upperRoomId, players: room.players });
+      socket.join(cleanRoomId);
+      socket.emit('joinedRoom', { roomId: cleanRoomId, players: room.players });
       
-      // Broadcast to all players in room
-      io.to(upperRoomId).emit('playerJoined', { 
+      io.to(cleanRoomId).emit('playerJoined', { 
         playerId: socket.id, 
         playerCount: room.players.length,
         newPlayer: userData
       });
       
-      console.log(`Player ${socket.id} joined room ${upperRoomId}. Total players: ${room.players.length}`);
+      console.log(`SUCCESS: Player joined room ${cleanRoomId}`);
     } else {
-      socket.emit('joinError', `Room ${upperRoomId} not found. Available: ${Array.from(rooms.keys()).join(', ')}`);
-      console.log(`Join failed for ${socket.id}: Room ${upperRoomId} does not exist. Available rooms:`, Array.from(rooms.keys()));
+      console.log(`FAILED: Room ${cleanRoomId} not found`);
+      socket.emit('joinError', 'Room not found');
     }
+    console.log(`=== END DEBUG ===\n`);
   });
 
   socket.on('startAuction', (data) => {
