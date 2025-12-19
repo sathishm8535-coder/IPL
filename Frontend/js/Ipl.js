@@ -3544,9 +3544,9 @@ function setupSocketListeners() {
       statusEl.style.color = '#f44336';
     }
     showNotification(`Join Error: ${error}`, 'error');
-    // Clear room input on error
-    const roomInput = document.getElementById('roomId');
-    if (roomInput) roomInput.value = '';
+    // Don't clear room input on error so user can try again
+    isMultiplayer = false;
+    currentRoomId = null;
   });
 
   socket.on('playerJoined', (data) => {
@@ -3695,6 +3695,14 @@ if (joinBtn) {
     const id = roomInput.value.trim().toUpperCase();
     if (!id) {
       showNotification('Enter a Room ID to join!', 'error');
+      roomInput.focus();
+      return;
+    }
+    
+    // Validate room ID format (6 characters, alphanumeric)
+    if (id.length !== 6 || !/^[A-Z0-9]+$/.test(id)) {
+      showNotification('Room ID must be 6 characters (letters and numbers only)', 'error');
+      roomInput.focus();
       return;
     }
     
@@ -3720,9 +3728,16 @@ if (joinBtn) {
       uid: playerData?.uid || socket.id
     };
     
-    console.log('Attempting to join room:', id, 'Socket connected:', socket.connected);
+    console.log('Attempting to join room:', id, 'with userData:', userData);
     document.getElementById('roomStatus').textContent = `Joining room ${id}...`;
     document.getElementById('roomStatus').style.color = '#2196F3';
+    
+    // Disable join button temporarily to prevent multiple clicks
+    joinBtn.disabled = true;
+    setTimeout(() => {
+      joinBtn.disabled = false;
+    }, 3000);
+    
     socket.emit("joinRoom", { roomId: id, userData });
   });
 }
