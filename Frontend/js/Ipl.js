@@ -3451,16 +3451,16 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  // Try to connect to deployed server first, fallback to localhost
-  const serverUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000' 
-    : 'https://ipl-cca1.onrender.com';
+  // Always connect to current server
+  const serverUrl = `${window.location.protocol}//${window.location.host}`;
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
     timeout: 20000,
     forceNew: true
   });
+  
+  console.log('Connecting to server:', serverUrl);
 
   socket.on('connect', () => {
     console.log('Connected to server:', socket.id);
@@ -3647,8 +3647,14 @@ const roomInput = document.getElementById("roomId");
 // Create Room button click
 if (createBtn) {
   createBtn.addEventListener("click", () => {
-    if (!socket || !socket.connected) {
-      showNotification('Not connected to server. Please refresh and try again.', 'error');
+    if (!socket) {
+      showNotification('Socket not initialized. Please refresh the page.', 'error');
+      return;
+    }
+    
+    if (!socket.connected) {
+      showNotification('Not connected to server. Trying to reconnect...', 'error');
+      socket.connect();
       return;
     }
     
@@ -3658,6 +3664,7 @@ if (createBtn) {
       uid: playerData?.uid || socket.id
     };
     
+    console.log('Creating room with userData:', userData);
     socket.emit("createRoom", userData);
   });
 }
@@ -3671,8 +3678,14 @@ if (joinBtn) {
       return;
     }
     
-    if (!socket || !socket.connected) {
-      showNotification('Not connected to server. Please refresh and try again.', 'error');
+    if (!socket) {
+      showNotification('Socket not initialized. Please refresh the page.', 'error');
+      return;
+    }
+    
+    if (!socket.connected) {
+      showNotification('Not connected to server. Trying to reconnect...', 'error');
+      socket.connect();
       return;
     }
     
@@ -3682,8 +3695,9 @@ if (joinBtn) {
       uid: playerData?.uid || socket.id
     };
     
-    console.log('Attempting to join room:', id, 'with userData:', userData);
+    console.log('Attempting to join room:', id, 'Socket connected:', socket.connected);
     document.getElementById('roomStatus').textContent = `Joining room ${id}...`;
+    document.getElementById('roomStatus').style.color = '#2196F3';
     socket.emit("joinRoom", { roomId: id, userData });
   });
 }

@@ -207,7 +207,7 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+const HOST = '0.0.0.0'; // Listen on all interfaces for network access
 
 server.listen(PORT, HOST, () => {
   console.log(`🏏 IPL Auction Server running on port ${PORT}`);
