@@ -3094,6 +3094,7 @@ function declineNow() {
 /* ====== Assign player to highest bidder or mark unsold ====== */
 function assignPlayer(skipped = false) {
   const p = players[currentPlayerIndex];
+  let winningTeam = null;
 
   // clear timer if running
   if (timerInterval) {
@@ -3124,6 +3125,7 @@ function assignPlayer(skipped = false) {
       team.budget = +(team.budget - currentPrice).toFixed(2);
       team.totalPoints += p.points || 0;
       if (p.foreign) team.foreignCount++;
+      winningTeam = team;
       auctionHistory.insertAdjacentHTML(
         "afterbegin",
         `<li>✅ ${p.name} → ${team.teamName} (${team.friendName}) sold for ₹${currentPrice} Cr (+${p.points || 0} pts)</li>`
@@ -3137,30 +3139,31 @@ function assignPlayer(skipped = false) {
     );
   }
 
-  // reset
-  highestBidderIdx = -1;
-  currentPlayerIndex++;
-  updateTeamsView();
-
-  // Send player assignment and next player event in multiplayer mode
+  // Send player assignment in multiplayer mode BEFORE moving to next player
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
-    const assignedPlayer = players[currentPlayerIndex - 1];
-    const winningTeam = highestBidderIdx !== -1 ? teams[highestBidderIdx] : null;
-    
     socket.emit('playerAssigned', {
       roomId: currentRoomId,
-      player: assignedPlayer,
+      player: p,
       winningTeam: winningTeam,
       price: currentPrice,
       skipped: skipped
     });
-    
+  }
+
+  // reset and move to next player
+  highestBidderIdx = -1;
+  currentPlayerIndex++;
+  updateTeamsView();
+
+  // Send next player event in multiplayer mode
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
       playerIndex: currentPlayerIndex
     });
   }
 
+  // Auto move to next player
   setTimeout(() => {
     if (currentPlayerIndex < players.length) {
       loadPlayer();
@@ -3180,7 +3183,7 @@ function assignPlayer(skipped = false) {
         showWinnerBtn.style.display = "inline-block";
       }
     }
-  }, 600);
+  }, 1000);
 }
 
 /* ====== Skip current player from History (Next Player action) ====== */
