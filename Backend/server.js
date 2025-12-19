@@ -92,23 +92,27 @@ io.on('connection', (socket) => {
     if (room) {
       room.teams = teams;
       room.gameState.isActive = true;
-      io.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
-      console.log(`Auction started in room ${roomId}`);
+      room.gameState.currentPlayerIndex = 0;
+      // Broadcast to all other players in room
+      socket.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
+      console.log(`Auction started in room ${roomId} with ${teams.length} teams`);
     }
   });
 
   socket.on('placeBid', (data) => {
-    const { roomId, bidAmount, teamIndex, playerName } = data;
+    const { roomId, bidAmount, teamIndex, playerName, socketId } = data;
     const room = rooms.get(roomId);
     if (room && room.gameState.isActive) {
       room.gameState.currentPrice = bidAmount;
       room.gameState.highestBidder = { teamIndex, playerName };
-      room.gameState.timer = 10; // Reset timer
+      room.gameState.timer = 10;
       room.currentBid = { teamIndex, bidAmount, playerName, timestamp: Date.now() };
+      // Broadcast to all players in room
       io.to(roomId).emit('bidPlaced', {
         bidAmount,
         teamIndex,
         playerName,
+        socketId,
         gameState: room.gameState
       });
       console.log(`Bid placed in room ${roomId}: ${bidAmount} by ${playerName}`);
@@ -116,15 +120,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('nextPlayer', (data) => {
-    const { roomId } = data;
+    const { roomId, playerIndex } = data;
     const room = rooms.get(roomId);
     if (room) {
-      room.gameState.currentPlayerIndex++;
+      room.gameState.currentPlayerIndex = playerIndex || room.gameState.currentPlayerIndex + 1;
       room.gameState.currentPrice = 0;
       room.gameState.highestBidder = null;
       room.gameState.timer = 10;
-      io.to(roomId).emit('playerChanged', { gameState: room.gameState });
-      console.log(`Next player in room ${roomId}`);
+      // Broadcast to all players except sender
+      socket.to(roomId).emit('playerChanged', { gameState: room.gameState });
+      console.log(`Next player in room ${roomId}: index ${room.gameState.currentPlayerIndex}`);
     }
   });
 
@@ -134,6 +139,21 @@ io.on('connection', (socket) => {
     if (room) {
       room.gameState = { ...room.gameState, ...gameState };
       socket.to(roomId).emit('gameStateUpdated', room.gameState);
+    }
+  });
+
+  socket.on('playerAssigned', (data) => {
+    const { roomId, player, winningTeam, price, skipped } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      // Broadcast player assignment to all other players
+      socket.to(roomId).emit('playerAssigned', {
+        player,
+        winningTeam,
+        price,
+        skipped
+      });
+      console.log(`Player ${player.name} assigned in room ${roomId}`);
     }
   });
 

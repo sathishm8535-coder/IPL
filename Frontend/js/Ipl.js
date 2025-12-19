@@ -3077,7 +3077,8 @@ function bidNow(idx) {
       roomId: currentRoomId,
       bidAmount: currentPrice,
       teamIndex: idx,
-      playerName: `${t.friendName} (${t.teamName})`
+      playerName: `${t.friendName} (${t.teamName})`,
+      socketId: socket.id
     });
   }
 }
@@ -3143,8 +3144,19 @@ function assignPlayer(skipped = false) {
   currentPlayerIndex++;
   updateTeamsView();
 
-  // Send next player event in multiplayer mode
+  // Send player assignment and next player event in multiplayer mode
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    const assignedPlayer = players[currentPlayerIndex - 1];
+    const winningTeam = highestBidderIdx !== -1 ? teams[highestBidderIdx] : null;
+    
+    socket.emit('playerAssigned', {
+      roomId: currentRoomId,
+      player: assignedPlayer,
+      winningTeam: winningTeam,
+      price: currentPrice,
+      skipped: skipped
+    });
+    
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
       playerIndex: currentPlayerIndex
@@ -3495,6 +3507,7 @@ function setupSocketListeners() {
     console.log('Room created:', roomId);
     currentRoomId = roomId;
     document.getElementById('roomId').value = roomId;
+    document.getElementById('roomStatus').textContent = `Room ${roomId} created - Share this ID with other players`;
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
   });
@@ -3502,6 +3515,7 @@ function setupSocketListeners() {
   socket.on('joinedRoom', (data) => {
     console.log('Joined room:', data);
     currentRoomId = data.roomId;
+    document.getElementById('roomStatus').textContent = `Connected to Room ${data.roomId} - ${data.players.length} players`;
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
   });
@@ -3511,6 +3525,7 @@ function setupSocketListeners() {
   });
 
   socket.on('playerJoined', (data) => {
+    document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} players connected`;
     showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
   });
 
@@ -3523,32 +3538,50 @@ function setupSocketListeners() {
     // Sync teams and game state
     if (data.teams) {
       teams = data.teams;
+      // Hide selection and show auction for all players
+      document.getElementById("team-selection").style.display = "none";
+      auctionBlock.style.display = "grid";
+      populateBidButtons();
       updateTeamsView();
+      currentPlayerIndex = 0;
+      loadPlayer();
+      showNotification('Auction Started by room host!', 'success');
     }
   });
 
   socket.on('bidPlaced', (data) => {
     console.log('Bid received:', data);
-    // Update UI with new bid
-    currentPrice = data.bidAmount;
-    highestBidderIdx = data.teamIndex;
-    currentPriceEl.textContent = currentPrice;
-    highestBidderEl.textContent = data.playerName;
-    
-    // Reset timer
-    countdown = NO_BID_SECONDS;
-    timerEl.textContent = `${countdown}s`;
-    startCountdownIfNeeded();
-    
-    showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
+    // Only update if this bid is from another player
+    if (data.socketId !== socket.id) {
+      currentPrice = data.bidAmount;
+      highestBidderIdx = data.teamIndex;
+      currentPriceEl.textContent = currentPrice;
+      highestBidderEl.textContent = data.playerName;
+      
+      // Reset timer
+      countdown = NO_BID_SECONDS;
+      timerEl.textContent = `${countdown}s`;
+      startCountdownIfNeeded();
+      
+      showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
+    }
   });
 
   socket.on('playerChanged', (data) => {
     console.log('Player changed:', data);
     // Move to next player
     currentPlayerIndex = data.gameState.currentPlayerIndex;
+    highestBidderIdx = -1;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
     if (currentPlayerIndex < players.length) {
       loadPlayer();
+      showNotification('Next player loaded', 'info');
+    } else {
+      showNotification('Auction completed!', 'success');
+      showResult();
     }
   });
 
@@ -3561,6 +3594,22 @@ function setupSocketListeners() {
     if (gameState.currentPrice !== undefined) {
       currentPrice = gameState.currentPrice;
       currentPriceEl.textContent = currentPrice;
+    }
+  });
+
+  socket.on('playerAssigned', (data) => {
+    console.log('Player assigned:', data);
+    if (data.winningTeam && !data.skipped) {
+      // Find the team in local teams array and update it
+      const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
+      if (teamIndex !== -1) {
+        teams[teamIndex].players.push(data.player);
+        teams[teamIndex].budget = +(teams[teamIndex].budget - data.price).toFixed(2);
+        teams[teamIndex].totalPoints += data.player.points || 0;
+        if (data.player.foreign) teams[teamIndex].foreignCount++;
+        updateTeamsView();
+        updateLiveScoreboard();
+      }
     }
   });
 }
