@@ -17,21 +17,21 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from Frontend folder
-app.use(express.static(path.join(__dirname, '../Frontend')));
+app.use(express.static(path.join(__dirname, 'Frontend')));
 
 // Route for root URL - serve login page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Frontend/login.html'));
+  res.sendFile(path.join(__dirname, 'Frontend/login.html'));
 });
 
 // Route for login page
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Frontend/login.html'));
+  res.sendFile(path.join(__dirname, 'Frontend/login.html'));
 });
 
 // Route for main game (after login)
 app.get('/game', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Frontend/index.html'));
+  res.sendFile(path.join(__dirname, 'Frontend/index.html'));
 });
 
 // API status route
