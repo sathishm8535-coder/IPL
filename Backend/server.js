@@ -114,8 +114,8 @@ io.on('connection', (socket) => {
       room.teams = teams;
       room.gameState.isActive = true;
       room.gameState.currentPlayerIndex = 0;
-      // Broadcast to all other players in room
-      socket.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
+      // Broadcast to ALL players in room including sender
+      io.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
       console.log(`Auction started in room ${roomId} with ${teams.length} teams`);
     }
   });
@@ -148,8 +148,8 @@ io.on('connection', (socket) => {
       room.gameState.currentPrice = 0;
       room.gameState.highestBidder = null;
       room.gameState.timer = 10;
-      // Broadcast to all players except sender
-      socket.to(roomId).emit('playerChanged', { gameState: room.gameState });
+      // Broadcast to ALL players in room
+      io.to(roomId).emit('playerChanged', { gameState: room.gameState });
       console.log(`Next player in room ${roomId}: index ${room.gameState.currentPlayerIndex}`);
     }
   });
@@ -167,8 +167,15 @@ io.on('connection', (socket) => {
     const { roomId, player, winningTeam, price, skipped } = data;
     const room = rooms.get(roomId);
     if (room) {
-      // Broadcast player assignment to all other players
-      socket.to(roomId).emit('playerAssigned', {
+      // Update room teams
+      if (room.teams && winningTeam && !skipped) {
+        const teamIndex = room.teams.findIndex(t => t.teamName === winningTeam.teamName);
+        if (teamIndex !== -1) {
+          room.teams[teamIndex] = winningTeam;
+        }
+      }
+      // Broadcast player assignment to ALL players
+      io.to(roomId).emit('playerAssigned', {
         player,
         winningTeam,
         price,

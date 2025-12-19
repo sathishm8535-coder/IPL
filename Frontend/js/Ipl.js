@@ -2931,24 +2931,22 @@ function startAuction() {
     });
   }
 
-  // Send auction start to other players if in multiplayer mode
+  // Send auction start to all players if in multiplayer mode
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
     socket.emit('startAuction', {
       roomId: currentRoomId,
       teams: teams
     });
+  } else {
+    // Single player mode
+    document.getElementById("team-selection").style.display = "none";
+    auctionBlock.style.display = "grid";
+    populateBidButtons();
+    updateTeamsView();
+    currentPlayerIndex = 0;
+    loadPlayer();
+    showNotification('Auction Started!', 'success');
   }
-
-  // hide selection and show auction
-  document.getElementById("team-selection").style.display = "none";
-  auctionBlock.style.display = "grid";
-
-  populateBidButtons();
-  updateTeamsView();
-  currentPlayerIndex = 0;
-  loadPlayer();
-  
-  showNotification('Auction Started!', 'success');
 }
 
 /* ====== Populate bid buttons with avatar & friend name ====== */
@@ -3547,17 +3545,17 @@ function setupSocketListeners() {
 
   socket.on('auctionStarted', (data) => {
     console.log('Auction started:', data);
-    // Sync teams and game state
+    // Sync teams and game state for ALL players
     if (data.teams) {
       teams = data.teams;
+      currentPlayerIndex = data.gameState.currentPlayerIndex || 0;
       // Hide selection and show auction for all players
       document.getElementById("team-selection").style.display = "none";
       auctionBlock.style.display = "grid";
       populateBidButtons();
       updateTeamsView();
-      currentPlayerIndex = 0;
       loadPlayer();
-      showNotification('Auction Started by room host!', 'success');
+      showNotification('Auction Started - All players can bid!', 'success');
     }
   });
 
@@ -3615,10 +3613,16 @@ function setupSocketListeners() {
       // Find the team in local teams array and update it
       const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
       if (teamIndex !== -1) {
-        teams[teamIndex].players.push(data.player);
-        teams[teamIndex].budget = +(teams[teamIndex].budget - data.price).toFixed(2);
-        teams[teamIndex].totalPoints += data.player.points || 0;
-        if (data.player.foreign) teams[teamIndex].foreignCount++;
+        // Only add if player not already in team
+        const playerExists = teams[teamIndex].players.some(p => 
+          (typeof p === 'string' ? p : p.name) === data.player.name
+        );
+        if (!playerExists) {
+          teams[teamIndex].players.push(data.player);
+          teams[teamIndex].budget = +(teams[teamIndex].budget - data.price).toFixed(2);
+          teams[teamIndex].totalPoints += data.player.points || 0;
+          if (data.player.foreign) teams[teamIndex].foreignCount++;
+        }
         updateTeamsView();
         updateLiveScoreboard();
       }
