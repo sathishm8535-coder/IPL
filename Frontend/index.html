@@ -15,11 +15,11 @@
 
 <body>
     <script>
-        // Check if user is logged in
+        // Check if user is logged in; if not, send to login page
         const userInfo = localStorage.getItem('userInfo');
         console.log('index.html loaded - localStorage userInfo:', userInfo);
         if (!userInfo) {
-            window.location.replace('/');
+            window.location.replace('login.html');
         }
     </script>
     <div class="wrap">
