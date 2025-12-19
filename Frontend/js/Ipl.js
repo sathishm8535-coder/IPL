@@ -10,15 +10,7 @@ const players = [
     points:10,
     pic: "assets/bat1.jpg",
   },
-  {
-    name: "M.H.IBRAHIM",
-    country: "India",
-    category: "Batsman",
-    basePrice: 2,
-    foreign: false,
-    points:10,
-    pic: "IPL_auction/assests/bat01.jpg",
-  },
+
   {
     name: "RAJAT PATIDAR",
     country: "India",
