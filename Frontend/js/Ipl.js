@@ -3527,6 +3527,7 @@ function setupSocketListeners() {
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
     document.getElementById('roomStatus').textContent = `Failed to join room: ${error}`;
+    document.getElementById('roomStatus').style.color = '#f44336';
     showNotification(`Join Error: ${error}`, 'error');
   });
 

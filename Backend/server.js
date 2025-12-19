@@ -45,12 +45,17 @@ app.get('/api/status', (req, res) => {
 
 const rooms = new Map();
 
+// Log all active rooms for debugging
+setInterval(() => {
+  console.log('Active rooms:', Array.from(rooms.keys()));
+}, 30000);
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('createRoom', (userData) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    rooms.set(roomId, {
+    const roomData = {
       id: roomId,
       players: [{ socketId: socket.id, ...userData }],
       gameState: {
@@ -61,15 +66,18 @@ io.on('connection', (socket) => {
         isActive: false
       },
       teams: [],
-      currentBid: null
-    });
+      currentBid: null,
+      createdAt: new Date().toISOString()
+    };
+    rooms.set(roomId, roomData);
     socket.join(roomId);
     socket.emit('roomCreated', roomId);
-    console.log(`Room ${roomId} created by ${socket.id}`);
+    console.log(`Room ${roomId} created by ${socket.id}. Total rooms: ${rooms.size}`);
   });
 
   socket.on('joinRoom', (data) => {
     const { roomId, userData } = data;
+    console.log(`Join attempt - Room: ${roomId}, Available rooms:`, Array.from(rooms.keys()));
     const room = rooms.get(roomId);
     if (room && room.players.length < 10) {
       room.players.push({ socketId: socket.id, ...userData });
@@ -84,7 +92,7 @@ io.on('connection', (socket) => {
     } else {
       const errorMsg = room ? 'Room is full (max 10 players)' : 'Room not found';
       socket.emit('joinError', errorMsg);
-      console.log(`Join failed for ${socket.id}: ${errorMsg}`);
+      console.log(`Join failed for ${socket.id}: ${errorMsg}. Room exists: ${!!room}`);
     }
   });
 
