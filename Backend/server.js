@@ -82,7 +82,9 @@ io.on('connection', (socket) => {
       });
       console.log(`Player ${socket.id} joined room ${roomId}`);
     } else {
-      socket.emit('joinError', 'Room not found or full');
+      const errorMsg = room ? 'Room is full (max 10 players)' : 'Room not found';
+      socket.emit('joinError', errorMsg);
+      console.log(`Join failed for ${socket.id}: ${errorMsg}`);
     }
   });
 

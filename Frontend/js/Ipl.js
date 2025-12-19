@@ -3507,20 +3507,26 @@ function setupSocketListeners() {
     console.log('Room created:', roomId);
     currentRoomId = roomId;
     document.getElementById('roomId').value = roomId;
-    document.getElementById('roomStatus').textContent = `Room ${roomId} created - Share this ID with other players`;
+    const statusText = `Room ${roomId} created - Share this ID with other players`;
+    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
   });
 
   socket.on('joinedRoom', (data) => {
-    console.log('Joined room:', data);
+    console.log('Successfully joined room:', data);
     currentRoomId = data.roomId;
-    document.getElementById('roomStatus').textContent = `Connected to Room ${data.roomId} - ${data.players.length} players`;
+    const statusText = `Connected to Room ${data.roomId} - ${data.players.length} player(s)`;
+    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
   });
 
   socket.on('joinError', (error) => {
+    console.error('Join error:', error);
+    document.getElementById('roomStatus').textContent = `Failed to join room: ${error}`;
     showNotification(`Join Error: ${error}`, 'error');
   });
 
@@ -3649,7 +3655,7 @@ if (createBtn) {
 // Join Room button click
 if (joinBtn) {
   joinBtn.addEventListener("click", () => {
-    const id = roomInput.value.trim();
+    const id = roomInput.value.trim().toUpperCase();
     if (!id) {
       showNotification('Enter a Room ID to join!', 'error');
       return;
@@ -3666,6 +3672,8 @@ if (joinBtn) {
       uid: playerData?.uid || socket.id
     };
     
+    console.log('Attempting to join room:', id, 'with userData:', userData);
+    document.getElementById('roomStatus').textContent = `Joining room ${id}...`;
     socket.emit("joinRoom", { roomId: id, userData });
   });
 }
