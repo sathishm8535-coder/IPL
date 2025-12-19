@@ -3436,8 +3436,8 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  // Always connect to current server
-  const serverUrl = `${window.location.protocol}//${window.location.host}`;
+  // Connect to Render backend API
+  const serverUrl = 'https://ipl-cca1.onrender.com';
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
@@ -3460,7 +3460,15 @@ function initializeSocket() {
   socket.on('connect_error', (error) => {
     console.error('Connection error:', error);
     updateConnectionStatus(false);
-    showNotification('Connection failed. Please check server and try again.', 'error');
+    showNotification('Connection failed. Server may be starting up. Please wait and try again.', 'error');
+    
+    // Try to reconnect after 5 seconds
+    setTimeout(() => {
+      if (!socket.connected) {
+        console.log('Attempting to reconnect...');
+        socket.connect();
+      }
+    }, 5000);
   });
 
   socket.on('reconnect', () => {
@@ -3485,14 +3493,24 @@ function updateConnectionStatus(connected) {
     document.body.appendChild(status);
   }
   const statusElement = document.getElementById('connectionStatus');
+  const serverStatusEl = document.getElementById('serverStatus');
+  
   if (connected) {
     statusElement.textContent = '🟢 Connected';
     statusElement.style.backgroundColor = '#4CAF50';
     statusElement.style.color = 'white';
+    if (serverStatusEl) {
+      serverStatusEl.textContent = '✅ Backend connected';
+      serverStatusEl.style.color = '#4CAF50';
+    }
   } else {
     statusElement.textContent = '🔴 Disconnected';
     statusElement.style.backgroundColor = '#f44336';
     statusElement.style.color = 'white';
+    if (serverStatusEl) {
+      serverStatusEl.textContent = '❌ Backend disconnected - Retrying...';
+      serverStatusEl.style.color = '#f44336';
+    }
   }
 }
 
