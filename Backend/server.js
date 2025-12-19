@@ -84,14 +84,25 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', (data) => {
     const { roomId, userData } = data;
     console.log(`Join attempt - Room: ${roomId}, Available rooms:`, Array.from(rooms.keys()));
+    console.log(`Room data received:`, data);
     
     if (!roomId || typeof roomId !== 'string') {
       socket.emit('joinError', 'Invalid room ID');
       return;
     }
     
-    const upperRoomId = roomId.toUpperCase();
-    const room = rooms.get(upperRoomId);
+    const upperRoomId = roomId.toUpperCase().trim();
+    console.log(`Looking for room: ${upperRoomId}`);
+    
+    // Check all rooms with exact match
+    let room = null;
+    for (const [key, value] of rooms.entries()) {
+      console.log(`Checking room key: '${key}' against '${upperRoomId}'`);
+      if (key === upperRoomId) {
+        room = value;
+        break;
+      }
+    }
     
     if (room) {
       if (room.players.length >= 10) {
@@ -118,8 +129,8 @@ io.on('connection', (socket) => {
       
       console.log(`Player ${socket.id} joined room ${upperRoomId}. Total players: ${room.players.length}`);
     } else {
-      socket.emit('joinError', `Room ${upperRoomId} not found. Please check the Room ID.`);
-      console.log(`Join failed for ${socket.id}: Room ${upperRoomId} does not exist`);
+      socket.emit('joinError', `Room ${upperRoomId} not found. Available: ${Array.from(rooms.keys()).join(', ')}`);
+      console.log(`Join failed for ${socket.id}: Room ${upperRoomId} does not exist. Available rooms:`, Array.from(rooms.keys()));
     }
   });
 
