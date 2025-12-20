@@ -3441,6 +3441,10 @@ function viewSquads() {
   });
 }
 
+/* Multiplayer team selection tracking */
+let roomSelectedTeams = [];
+let mySelectedTeam = null;
+
 // Multiplayer functionality
 let socket = null;
 let currentRoomId = null;

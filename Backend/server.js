@@ -72,6 +72,7 @@ io.on('connection', (socket) => {
         isActive: false
       },
       teams: [],
+      selectedTeams: [], // Track selected teams
       currentBid: null,
       createdAt: new Date().toISOString(),
       host: socket.id
@@ -104,7 +105,17 @@ io.on('connection', (socket) => {
       }
       
       socket.join(roomId);
-      socket.emit('joinedRoom', { roomId, players: room.players });
+      socket.emit('joinedRoom', { 
+        roomId, 
+        players: room.players,
+        selectedTeams: room.selectedTeams || []
+      });
+      
+      // Broadcast to other players that someone joined
+      socket.to(roomId).emit('playerJoined', {
+        playerCount: room.players.length,
+        selectedTeams: room.selectedTeams || []
+      });
       
       console.log('Player joined successfully');
     } else {
@@ -188,6 +199,50 @@ io.on('connection', (socket) => {
         skipped
       });
       console.log(`Player ${player.name} assigned in room ${roomId}`);
+    }
+  });
+
+  // Handle team selection synchronization
+  socket.on('selectTeam', (data) => {
+    const { roomId, teamName, socketId } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      if (!room.selectedTeams) room.selectedTeams = [];
+      
+      // Check if team is already selected
+      if (room.selectedTeams.includes(teamName)) {
+        socket.emit('teamSelectionError', 'Team already selected by another player');
+        return;
+      }
+      
+      // Add team to selected list
+      room.selectedTeams.push(teamName);
+      
+      // Broadcast team selection to all players in room
+      io.to(roomId).emit('teamSelected', {
+        teamName,
+        selectedBy: socketId,
+        selectedTeams: room.selectedTeams
+      });
+      
+      console.log(`Team ${teamName} selected in room ${roomId}`);
+    }
+  });
+
+  // Handle team deselection
+  socket.on('deselectTeam', (data) => {
+    const { roomId, teamName } = data;
+    const room = rooms.get(roomId);
+    if (room && room.selectedTeams) {
+      room.selectedTeams = room.selectedTeams.filter(t => t !== teamName);
+      
+      // Broadcast team deselection to all players
+      io.to(roomId).emit('teamDeselected', {
+        teamName,
+        selectedTeams: room.selectedTeams
+      });
+      
+      console.log(`Team ${teamName} deselected in room ${roomId}`);
     }
   });
 
