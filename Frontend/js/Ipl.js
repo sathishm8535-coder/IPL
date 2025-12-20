@@ -3444,16 +3444,13 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  // For local multiplayer, connect to the same server that served this page
-  const serverUrl = window.location.origin;
-  
-  socket = io(serverUrl, {
+  // Connect to the same server that served this page
+  socket = io({
     transports: ['websocket', 'polling'],
-    timeout: 20000,
-    forceNew: true
+    timeout: 10000
   });
   
-  console.log('Connecting to server:', serverUrl);
+  console.log('Connecting to server...');
 
   socket.on('connect', () => {
     console.log('Connected to server:', socket.id);
@@ -3468,25 +3465,7 @@ function initializeSocket() {
   socket.on('connect_error', (error) => {
     console.error('Connection error:', error);
     updateConnectionStatus(false);
-    showNotification('Connection failed. Server may be starting up. Please wait and try again.', 'error');
-    
-    // Try to reconnect after 5 seconds
-    setTimeout(() => {
-      if (!socket.connected) {
-        console.log('Attempting to reconnect...');
-        socket.connect();
-      }
-    }, 5000);
-  });
-
-  socket.on('reconnect', () => {
-    console.log('Reconnected to server');
-    updateConnectionStatus(true);
-    showNotification('Reconnected to server!', 'success');
-  });
-
-  socket.on('reconnect_error', () => {
-    showNotification('Reconnection failed. Please refresh page.', 'error');
+    showNotification('Connection failed. Please try again.', 'error');
   });
 
   setupSocketListeners();
@@ -3508,7 +3487,7 @@ function updateConnectionStatus(connected) {
     statusElement.style.backgroundColor = '#4CAF50';
     statusElement.style.color = 'white';
     if (serverStatusEl) {
-      serverStatusEl.innerHTML = `✅ Connected to: ${window.location.origin}`;
+      serverStatusEl.textContent = '✅ Server connected';
       serverStatusEl.style.color = '#4CAF50';
     }
   } else {
@@ -3516,7 +3495,7 @@ function updateConnectionStatus(connected) {
     statusElement.style.backgroundColor = '#f44336';
     statusElement.style.color = 'white';
     if (serverStatusEl) {
-      serverStatusEl.innerHTML = `❌ Disconnected from: ${window.location.origin} - Retrying...`;
+      serverStatusEl.textContent = '❌ Server disconnected';
       serverStatusEl.style.color = '#f44336';
     }
   }
