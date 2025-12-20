@@ -325,4 +325,49 @@ server.listen(PORT, HOST, () => {
   console.log(`🔐 Login Page: http://localhost:${PORT}`);
   console.log(`🎮 Game URL: http://localhost:${PORT}/game`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+});yerLeft', { 
+          playerId: socket.id, 
+          playerCount: room.players.length 
+        });
+        if (room.players.length === 0) {
+          rooms.delete(roomId);
+          console.log(`Room ${roomId} deleted - no players left`);
+        }
+        break;
+      }
+    }
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0'; // Listen on all interfaces for network access
+
+// Get local IP address for multiplayer setup
+function getLocalIP() {
+  const { networkInterfaces } = require('os');
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
+server.listen(PORT, HOST, () => {
+  const localIP = getLocalIP();
+  console.log('\n🏏 IPL AUCTION SERVER STARTED!');
+  console.log('=' .repeat(50));
+  console.log(`🌐 Server running on port ${PORT}`);
+  console.log(`\n📱 MULTIPLAYER SETUP:`);
+  console.log(`   Host computer: http://${localIP}:${PORT}`);
+  console.log(`   Other devices: http://${localIP}:${PORT}`);
+  console.log(`\n⚠️  IMPORTANT: All devices must use the SAME URL above!`);
+  console.log(`   Your IP address is: ${localIP}`);
+  console.log('=' .repeat(50));
+  console.log(`🔐 Login Page: http://localhost:${PORT}`);
+  console.log(`🎮 Game URL: http://localhost:${PORT}/game`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

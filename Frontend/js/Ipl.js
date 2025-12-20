@@ -2725,14 +2725,19 @@ if (viewSquadBtn) viewSquadBtn.addEventListener("click", viewSquads);
 /* ====== UI: build friend rows (friend left, team right, avatar upload) ====== */
 function buildTeamRows(count) {
   teamInputs.innerHTML = "";
-  for (let i = 0; i < count; i++) {
+  
+  // In multiplayer mode, only show one team selection row
+  const rowCount = isMultiplayer ? 1 : count;
+  
+  for (let i = 0; i < rowCount; i++) {
     const row = document.createElement("div");
     row.className = "team-row";
+    const labelText = isMultiplayer ? "Your Name:" : "Friend Name:";
     row.innerHTML = `
       <div class="team-left">
         <img id="avatar-preview-${i}" class="avatar-preview" src="" alt="" style="display:none">
-        <label>Friend Name:</label>
-        <input type="text" id="friend-name-${i}" placeholder="Enter friend name" />
+        <label>${labelText}</label>
+        <input type="text" id="friend-name-${i}" placeholder="${isMultiplayer ? 'Enter your name' : 'Enter friend name'}" />
         <input type="file" id="friend-file-${i}" accept="image/*" style="margin-left:8px" />
       </div>
       <div class="team-right">
@@ -2785,7 +2790,9 @@ function buildTeamRows(count) {
 
     // team change -> enforce uniqueness & show team logo only if no uploaded photo
     sel.addEventListener("change", () => {
-      updateTeamDropdowns();
+      if (!isMultiplayer) {
+        updateTeamDropdowns();
+      }
 
       const preview = document.getElementById(`avatar-preview-${i}`);
       const selected = sel.value;
@@ -2890,27 +2897,25 @@ function updateTeamDropdowns() {
 function startAuction() {
   const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
   const count = selects.length;
-  const selectedTeams = [];
-  teams = [];
-  for (let i = 0; i < count; i++) {
-    const friendEl = document.getElementById(`friend-name-${i}`);
-    const teamSel = document.getElementById(`team-select-${i}`);
-    const preview = document.getElementById(`avatar-preview-${i}`);
+  
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    // In multiplayer mode, each player selects only ONE team
+    if (count !== 1) {
+      showNotification("In multiplayer mode, select only one team for yourself", 'error');
+      return;
+    }
+    
+    const friendEl = document.getElementById(`friend-name-0`);
+    const teamSel = document.getElementById(`team-select-0`);
+    const preview = document.getElementById(`avatar-preview-0`);
 
-    const friendName =
-      friendEl && friendEl.value.trim()
-        ? friendEl.value.trim()
-        : `Friend ${i + 1}`;
+    const friendName = friendEl && friendEl.value.trim() ? friendEl.value.trim() : playerData?.name || 'Player';
     const teamName = teamSel ? teamSel.value : null;
+    
     if (!teamName) {
-      showNotification("Select team for all friends", 'error');
+      showNotification("Select your team", 'error');
       return;
     }
-    if (selectedTeams.includes(teamName)) {
-      showNotification(`${teamName} already selected — choose different IPL teams`, 'error');
-      return;
-    }
-    selectedTeams.push(teamName);
 
     // Determine avatar: uploaded photo takes priority, otherwise team logo
     let avatarDataUrl = "";
@@ -2920,7 +2925,7 @@ function startAuction() {
       avatarDataUrl = TEAM_LOGOS[teamName];
     }
 
-    teams.push({
+    const playerTeam = {
       teamName,
       friendName,
       avatarDataUrl,
@@ -2928,17 +2933,56 @@ function startAuction() {
       players: [],
       foreignCount: 0,
       totalPoints: 0,
-    });
-  }
+      socketId: socket.id
+    };
 
-  // Send auction start to all players if in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    // Send this player's team to server
     socket.emit('startAuction', {
       roomId: currentRoomId,
-      teams: teams
+      playerTeam: playerTeam
     });
+    
+    showNotification('Team submitted! Waiting for other players...', 'info');
   } else {
-    // Single player mode
+    // Single player mode - original logic
+    const selectedTeams = [];
+    teams = [];
+    for (let i = 0; i < count; i++) {
+      const friendEl = document.getElementById(`friend-name-${i}`);
+      const teamSel = document.getElementById(`team-select-${i}`);
+      const preview = document.getElementById(`avatar-preview-${i}`);
+
+      const friendName = friendEl && friendEl.value.trim() ? friendEl.value.trim() : `Friend ${i + 1}`;
+      const teamName = teamSel ? teamSel.value : null;
+      if (!teamName) {
+        showNotification("Select team for all friends", 'error');
+        return;
+      }
+      if (selectedTeams.includes(teamName)) {
+        showNotification(`${teamName} already selected — choose different IPL teams`, 'error');
+        return;
+      }
+      selectedTeams.push(teamName);
+
+      // Determine avatar: uploaded photo takes priority, otherwise team logo
+      let avatarDataUrl = "";
+      if (preview && preview.dataset.uploaded === "true" && preview.src) {
+        avatarDataUrl = preview.src;
+      } else if (teamName && TEAM_LOGOS[teamName]) {
+        avatarDataUrl = TEAM_LOGOS[teamName];
+      }
+
+      teams.push({
+        teamName,
+        friendName,
+        avatarDataUrl,
+        budget: DEFAULT_BUDGET,
+        players: [],
+        foreignCount: 0,
+        totalPoints: 0,
+      });
+    }
+
     document.getElementById("team-selection").style.display = "none";
     auctionBlock.style.display = "grid";
     populateBidButtons();
@@ -2952,18 +2996,37 @@ function startAuction() {
 /* ====== Populate bid buttons with avatar & friend name ====== */
 function populateBidButtons() {
   bidButtonsDiv.innerHTML = "";
-  teams.forEach((t, idx) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    const avatarHtml = t.avatarDataUrl
-      ? `<img src="${t.avatarDataUrl}" class="btn-avatar">`
-      : "";
-    btn.innerHTML = `${avatarHtml}<span style="white-space:nowrap">${escapeHtml(
-      t.friendName
-    )} — ${escapeHtml(t.teamName)}</span>`;
-    btn.addEventListener("click", () => bidNow(idx));
-    bidButtonsDiv.appendChild(btn);
-  });
+  
+  if (isMultiplayer && socket && currentRoomId) {
+    // In multiplayer mode, show only the current player's team button
+    const myTeam = teams.find(t => t.socketId === socket.id);
+    if (myTeam) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const avatarHtml = myTeam.avatarDataUrl
+        ? `<img src="${myTeam.avatarDataUrl}" class="btn-avatar">`
+        : "";
+      btn.innerHTML = `${avatarHtml}<span style="white-space:nowrap">${escapeHtml(
+        myTeam.friendName
+      )} — ${escapeHtml(myTeam.teamName)}</span>`;
+      btn.addEventListener("click", () => bidNow(teams.indexOf(myTeam)));
+      bidButtonsDiv.appendChild(btn);
+    }
+  } else {
+    // Single player mode - show all team buttons
+    teams.forEach((t, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const avatarHtml = t.avatarDataUrl
+        ? `<img src="${t.avatarDataUrl}" class="btn-avatar">`
+        : "";
+      btn.innerHTML = `${avatarHtml}<span style="white-space:nowrap">${escapeHtml(
+        t.friendName
+      )} — ${escapeHtml(t.teamName)}</span>`;
+      btn.addEventListener("click", () => bidNow(idx));
+      bidButtonsDiv.appendChild(btn);
+    });
+  }
 }
 
 /* simple escape to avoid accidental HTML injection via names */
@@ -3033,6 +3096,12 @@ function bidNow(idx) {
   const t = teams[idx];
   const p = players[currentPlayerIndex];
 
+  // In multiplayer mode, only allow bidding for own team
+  if (isMultiplayer && t.socketId !== socket.id) {
+    showNotification("You can only bid for your own team!", 'error');
+    return;
+  }
+
   // validations
   if (t.budget < currentPrice + priceIncrement) {
     showNotification(
@@ -3074,7 +3143,6 @@ function bidNow(idx) {
     socket.emit('placeBid', {
       roomId: currentRoomId,
       bidAmount: currentPrice,
-      teamIndex: idx,
       playerName: `${t.friendName} (${t.teamName})`,
       socketId: socket.id
     });
@@ -3116,17 +3184,23 @@ function assignPlayer(skipped = false) {
   }
 
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
-    socket.emit('playerAssigned', {
-      roomId: currentRoomId,
-      player: p,
-      winningTeam: winningTeam,
-      price: currentPrice,
-      skipped: skipped
-    });
-    socket.emit('nextPlayer', {
-      roomId: currentRoomId,
-      playerIndex: currentPlayerIndex + 1
-    });
+    // Only the room host handles player assignment and progression
+    const room = rooms?.get?.(currentRoomId);
+    const isHost = room?.host === socket.id;
+    
+    if (isHost) {
+      socket.emit('playerAssigned', {
+        roomId: currentRoomId,
+        player: p,
+        winningTeam: winningTeam,
+        price: currentPrice,
+        skipped: skipped
+      });
+      socket.emit('nextPlayer', {
+        roomId: currentRoomId,
+        playerIndex: currentPlayerIndex + 1
+      });
+    }
   } else {
     auctionHistory.insertAdjacentHTML(
       "afterbegin",
@@ -3510,6 +3584,19 @@ function setupSocketListeners() {
     showNotification(`Player left the room`, 'info');
   });
 
+  socket.on('waitingForPlayers', (data) => {
+    showNotification(`Waiting for players: ${data.ready}/${data.total} ready`, 'info');
+  });
+
+  socket.on('teamsUpdated', (data) => {
+    console.log('Teams updated:', data);
+    if (data.teams) {
+      // Update teams but preserve socket IDs
+      teams = data.teams;
+      updateTeamsView();
+    }
+  });
+
   socket.on('auctionStarted', (data) => {
     console.log('Auction started:', data);
     // Sync teams and game state for ALL players
@@ -3583,8 +3670,10 @@ function setupSocketListeners() {
 
   socket.on('playerAssigned', (data) => {
     console.log('Player assigned:', data);
-    if (data.winningTeam && !data.skipped) {
-      const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
+    if (data.teams) {
+      teams = data.teams;
+    } else if (data.winningTeam && !data.skipped) {
+      const teamIndex = teams.findIndex(t => t.socketId === data.winningTeam.socketId);
       if (teamIndex !== -1) {
         const playerExists = teams[teamIndex].players.some(p => 
           (typeof p === 'string' ? p : p.name) === data.player.name
@@ -3595,15 +3684,16 @@ function setupSocketListeners() {
           teams[teamIndex].totalPoints += data.player.points || 0;
           if (data.player.foreign) teams[teamIndex].foreignCount++;
         }
-        updateTeamsView();
-        updateLiveScoreboard();
       }
     }
+    
+    updateTeamsView();
+    updateLiveScoreboard();
     
     auctionHistory.insertAdjacentHTML(
       "afterbegin",
       data.skipped ? `<li>❌ ${data.player.name} - UNSOLD</li>` :
-      `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} sold for ₹${data.price} Cr</li>`
+      `<li>✅ ${data.player.name} → ${data.winningTeam?.teamName || 'Unknown'} sold for ₹${data.price} Cr</li>`
     );
   });
 }
@@ -3644,6 +3734,10 @@ if (createBtn) {
     
     console.log('Creating room with userData:', userData);
     socket.emit("createRoom", userData);
+    
+    // Switch to multiplayer mode and rebuild UI
+    isMultiplayer = true;
+    buildTeamRows(1);
   });
 }
 
@@ -3695,6 +3789,10 @@ if (joinBtn) {
     setTimeout(() => {
       joinBtn.disabled = false;
     }, 3000);
+    
+    // Switch to multiplayer mode and rebuild UI
+    isMultiplayer = true;
+    buildTeamRows(1);
     
     socket.emit("joinRoom", { roomId: id, userData });
   });
