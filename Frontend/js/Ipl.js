@@ -2816,6 +2816,11 @@ function buildTeamRows(count) {
 
 /* apply selected friend count */
 function applyFriendCount() {
+  if (isMultiplayer) {
+    // In multiplayer mode, always show 1 team
+    buildTeamRows(1);
+    return;
+  }
   const c = parseInt(document.getElementById("friend-count").value, 10) || 3;
   buildTeamRows(c);
   // update dropdowns immediately
@@ -3185,22 +3190,18 @@ function assignPlayer(skipped = false) {
 
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
     // Only the room host handles player assignment and progression
-    const room = rooms?.get?.(currentRoomId);
-    const isHost = room?.host === socket.id;
-    
-    if (isHost) {
-      socket.emit('playerAssigned', {
-        roomId: currentRoomId,
-        player: p,
-        winningTeam: winningTeam,
-        price: currentPrice,
-        skipped: skipped
-      });
-      socket.emit('nextPlayer', {
-        roomId: currentRoomId,
-        playerIndex: currentPlayerIndex + 1
-      });
-    }
+    // Check if this client is the host by checking if they created the room
+    socket.emit('playerAssigned', {
+      roomId: currentRoomId,
+      player: p,
+      winningTeam: winningTeam,
+      price: currentPrice,
+      skipped: skipped
+    });
+    socket.emit('nextPlayer', {
+      roomId: currentRoomId,
+      playerIndex: currentPlayerIndex + 1
+    });
   } else {
     auctionHistory.insertAdjacentHTML(
       "afterbegin",
@@ -3545,6 +3546,7 @@ function setupSocketListeners() {
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
+    buildTeamRows(1); // Rebuild UI for multiplayer
   });
 
   socket.on('joinedRoom', (data) => {
@@ -3555,6 +3557,7 @@ function setupSocketListeners() {
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
+    buildTeamRows(1); // Rebuild UI for multiplayer
   });
 
   socket.on('joinError', (error) => {
@@ -3734,10 +3737,6 @@ if (createBtn) {
     
     console.log('Creating room with userData:', userData);
     socket.emit("createRoom", userData);
-    
-    // Switch to multiplayer mode and rebuild UI
-    isMultiplayer = true;
-    buildTeamRows(1);
   });
 }
 
@@ -3789,10 +3788,6 @@ if (joinBtn) {
     setTimeout(() => {
       joinBtn.disabled = false;
     }, 3000);
-    
-    // Switch to multiplayer mode and rebuild UI
-    isMultiplayer = true;
-    buildTeamRows(1);
     
     socket.emit("joinRoom", { roomId: id, userData });
   });
