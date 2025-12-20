@@ -3436,8 +3436,8 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  // Connect to Render backend API
-  const serverUrl = 'https://ipl-cca1.onrender.com';
+  // For local multiplayer, connect to the same server that served this page
+  const serverUrl = window.location.origin;
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
@@ -3500,7 +3500,7 @@ function updateConnectionStatus(connected) {
     statusElement.style.backgroundColor = '#4CAF50';
     statusElement.style.color = 'white';
     if (serverStatusEl) {
-      serverStatusEl.textContent = '✅ Backend connected';
+      serverStatusEl.innerHTML = `✅ Connected to: ${window.location.origin}`;
       serverStatusEl.style.color = '#4CAF50';
     }
   } else {
@@ -3508,7 +3508,7 @@ function updateConnectionStatus(connected) {
     statusElement.style.backgroundColor = '#f44336';
     statusElement.style.color = 'white';
     if (serverStatusEl) {
-      serverStatusEl.textContent = '❌ Backend disconnected - Retrying...';
+      serverStatusEl.innerHTML = `❌ Disconnected from: ${window.location.origin} - Retrying...`;
       serverStatusEl.style.color = '#f44336';
     }
   }
