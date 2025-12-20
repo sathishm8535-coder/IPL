@@ -11,6 +11,17 @@ const players = [
     pic: "assets/bat1.jpg",
   },
 
+  
+  {
+    name: "RAJAT PATIDAR",
+    country: "India",
+    category: "Batsman",
+    basePrice: 2,
+    foreign: false,
+    points: 8,
+    pic: "IPL_auction/assests/bat2.jpg",
+  },
+
   {
     name: "SURYA KUMAR YADAV",
     country: "India",
