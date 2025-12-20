@@ -31,6 +31,7 @@ io.on('connection', (socket) => {
 
   socket.on('createRoom', (userData) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    console.log('Creating room:', roomId);
     rooms.set(roomId, {
       id: roomId,
       players: [{ socketId: socket.id, userData: userData || { name: 'Anonymous' } }],
@@ -38,19 +39,62 @@ io.on('connection', (socket) => {
     });
     socket.join(roomId);
     socket.emit('roomCreated', roomId);
+    console.log('Room created successfully:', roomId, 'Total rooms:', rooms.size);
   });
 
   socket.on('joinRoom', (data) => {
+    console.log('Join room request:', data);
     const { roomId, userData } = data;
-    const room = rooms.get(roomId?.toUpperCase());
-    if (room && room.players.length < 10) {
-      room.players.push({ socketId: socket.id, userData: userData || { name: 'Anonymous' } });
-      socket.join(roomId.toUpperCase());
-      socket.emit('joinedRoom', { roomId: roomId.toUpperCase(), players: room.players });
-      socket.to(roomId.toUpperCase()).emit('playerJoined', { playerId: socket.id, playerCount: room.players.length });
-    } else {
-      socket.emit('joinError', room ? 'Room is full' : 'Room not found');
+    
+    if (!roomId) {
+      console.log('No room ID provided');
+      socket.emit('joinError', 'Room ID is required');
+      return;
     }
+    
+    const upperRoomId = roomId.toString().toUpperCase().trim();
+    console.log('Looking for room:', upperRoomId);
+    console.log('Available rooms:', Array.from(rooms.keys()));
+    
+    const room = rooms.get(upperRoomId);
+    
+    if (!room) {
+      console.log('Room not found!');
+      socket.emit('joinError', 'Room not found');
+      return;
+    }
+    
+    if (room.players.length >= 10) {
+      console.log('Room is full');
+      socket.emit('joinError', 'Room is full (max 10 players)');
+      return;
+    }
+    
+    // Check if player already in room
+    const existingPlayer = room.players.find(p => p.socketId === socket.id);
+    if (existingPlayer) {
+      console.log('Player already in room');
+      socket.emit('joinError', 'You are already in this room');
+      return;
+    }
+    
+    // Add player to room
+    room.players.push({ socketId: socket.id, userData: userData || { name: 'Anonymous' } });
+    socket.join(upperRoomId);
+    
+    socket.emit('joinedRoom', {
+      roomId: upperRoomId,
+      players: room.players,
+      gameState: room.gameState
+    });
+    
+    socket.to(upperRoomId).emit('playerJoined', {
+      playerId: socket.id,
+      playerCount: room.players.length,
+      newPlayer: userData
+    });
+    
+    console.log('Player joined room successfully:', upperRoomId, 'Total players:', room.players.length);
   });
 
   socket.on('startAuction', (data) => {
@@ -73,6 +117,27 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+    
+    // Remove player from all rooms
+    for (const [roomId, room] of rooms.entries()) {
+      const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
+      if (playerIndex !== -1) {
+        room.players.splice(playerIndex, 1);
+        console.log('Removed player from room:', roomId, 'Remaining players:', room.players.length);
+        
+        // Notify other players
+        socket.to(roomId).emit('playerLeft', {
+          playerId: socket.id,
+          playerCount: room.players.length
+        });
+        
+        // Delete room if empty
+        if (room.players.length === 0) {
+          rooms.delete(roomId);
+          console.log('Deleted empty room:', roomId);
+        }
+      }
+    }
   });
 });
 
