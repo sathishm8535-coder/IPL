@@ -34,13 +34,14 @@ app.get('/game', (req, res) => {
   res.sendFile(path.join(__dirname, '../Frontend/index.html'));
 });
 
-// API status route
-app.get('/api/status', (req, res) => {
-  res.json({ 
-    status: 'IPL Auction Server Running', 
-    rooms: rooms.size,
-    timestamp: new Date().toISOString()
-  });
+// Test route to check rooms
+app.get('/api/rooms', (req, res) => {
+  const roomList = Array.from(rooms.entries()).map(([id, room]) => ({
+    id,
+    players: room.players.length,
+    created: room.createdAt
+  }));
+  res.json({ rooms: roomList, total: rooms.size });
 });
 
 const rooms = new Map();
