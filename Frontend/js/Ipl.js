@@ -3459,6 +3459,12 @@ function initializeSocket() {
   socket.on('connect', () => {
     console.log('✅ Socket connected:', socket.id);
     updateConnectionStatus(true);
+    // Test connection
+    socket.emit('ping');
+  });
+
+  socket.on('pong', () => {
+    console.log('✅ Server responded to ping');
   });
 
   socket.on('disconnect', () => {
@@ -3547,14 +3553,17 @@ function setupSocketListeners() {
 
   socket.on('bidPlaced', (data) => {
     currentPrice = data.bidAmount;
-    highestBidderIdx = data.teamIndex;
-    currentPriceEl.textContent = currentPrice;
-    highestBidderEl.textContent = data.playerName;
-    countdown = NO_BID_SECONDS;
-    timerEl.textContent = `${countdown}s`;
-    startCountdownIfNeeded();
-    if (data.socketId !== socket.id) {
-      showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
+    const teamIndex = teams.findIndex(t => t.socketId === data.socketId);
+    if (teamIndex >= 0) {
+      highestBidderIdx = teamIndex;
+      currentPriceEl.textContent = currentPrice;
+      highestBidderEl.textContent = data.playerName;
+      countdown = NO_BID_SECONDS;
+      timerEl.textContent = `${countdown}s`;
+      startCountdownIfNeeded();
+      if (data.socketId !== socket.id) {
+        showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
+      }
     }
   });
 
@@ -3721,7 +3730,8 @@ function showNotification(message, type = 'info') {
 
 // Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initializeMultiplayer, 1000);
+  console.log('DOM loaded, initializing multiplayer...');
+  initializeMultiplayer();
 });
 
 
