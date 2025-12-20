@@ -83,53 +83,34 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinRoom', (data) => {
-    const { roomId, userData } = data;
-    console.log(`\n=== JOIN ROOM DEBUG ===`);
-    console.log(`Socket ID: ${socket.id}`);
-    console.log(`Requested Room ID: '${roomId}'`);
-    console.log(`Available rooms:`, Array.from(rooms.keys()));
-    console.log(`Room count: ${rooms.size}`);
+    console.log('JOIN ROOM EVENT RECEIVED:', data);
     
-    if (!roomId) {
-      socket.emit('joinError', 'Room ID is required');
+    if (!data || !data.roomId) {
+      console.log('No room ID provided');
+      socket.emit('joinError', 'Room ID required');
       return;
     }
     
-    const cleanRoomId = String(roomId).toUpperCase().trim();
-    console.log(`Clean Room ID: '${cleanRoomId}'`);
+    const roomId = data.roomId.toString().toUpperCase().trim();
+    console.log('Looking for room:', roomId);
+    console.log('Available rooms:', Array.from(rooms.keys()));
     
-    const room = rooms.get(cleanRoomId);
-    console.log(`Room found: ${!!room}`);
-    
-    if (room) {
-      console.log(`Room players: ${room.players.length}`);
+    if (rooms.has(roomId)) {
+      const room = rooms.get(roomId);
+      console.log('Room found! Players:', room.players.length);
       
-      if (room.players.length >= 10) {
-        socket.emit('joinError', 'Room is full');
-        return;
+      if (!room.players.find(p => p.socketId === socket.id)) {
+        room.players.push({ socketId: socket.id, ...data.userData });
       }
       
-      const existingPlayer = room.players.find(p => p.socketId === socket.id);
-      if (!existingPlayer) {
-        room.players.push({ socketId: socket.id, ...userData });
-        console.log(`Added player to room. New count: ${room.players.length}`);
-      }
+      socket.join(roomId);
+      socket.emit('joinedRoom', { roomId, players: room.players });
       
-      socket.join(cleanRoomId);
-      socket.emit('joinedRoom', { roomId: cleanRoomId, players: room.players });
-      
-      io.to(cleanRoomId).emit('playerJoined', { 
-        playerId: socket.id, 
-        playerCount: room.players.length,
-        newPlayer: userData
-      });
-      
-      console.log(`SUCCESS: Player joined room ${cleanRoomId}`);
+      console.log('Player joined successfully');
     } else {
-      console.log(`FAILED: Room ${cleanRoomId} not found`);
+      console.log('Room not found!');
       socket.emit('joinError', 'Room not found');
     }
-    console.log(`=== END DEBUG ===\n`);
   });
 
   socket.on('startAuction', (data) => {
