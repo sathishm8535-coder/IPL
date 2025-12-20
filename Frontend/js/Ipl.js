@@ -2937,6 +2937,11 @@ function startAuction() {
       roomId: currentRoomId,
       teams: teams
     });
+    // Also sync teams immediately
+    socket.emit('syncTeams', {
+      roomId: currentRoomId,
+      teams: teams
+    });
   } else {
     // Single player mode
     document.getElementById("team-selection").style.display = "none";
@@ -3551,6 +3556,15 @@ function setupSocketListeners() {
       updateTeamsView();
       loadPlayer();
       showNotification('Auction Started - All players can bid!', 'success');
+    }
+  });
+
+  socket.on('teamsUpdated', (data) => {
+    console.log('Teams updated:', data);
+    if (data.teams) {
+      // Sync team selection across all devices
+      teams = data.teams;
+      updateTeamsView();
     }
   });
 

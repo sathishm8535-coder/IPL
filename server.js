@@ -106,6 +106,15 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('syncTeams', (data) => {
+    const { roomId, teams } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      room.gameState.teams = teams;
+      socket.to(roomId).emit('teamsUpdated', { teams });
+    }
+  });
+
   socket.on('placeBid', (data) => {
     const { roomId, bidAmount, teamIndex, playerName, socketId } = data;
     const room = rooms.get(roomId);
