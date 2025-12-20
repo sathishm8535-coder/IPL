@@ -2900,78 +2900,65 @@ function updateTeamDropdowns() {
 
 /* ====== Start Auction (validate selections) ====== */
 function startAuction() {
-  const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
-  const count = selects.length;
-  
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
-    // In multiplayer mode, each player selects only ONE team
-    if (count !== 1) {
-      showNotification("In multiplayer mode, select only one team for yourself", 'error');
-      return;
-    }
-    
+    // Multiplayer: submit only one team
     const friendEl = document.getElementById(`friend-name-0`);
     const teamSel = document.getElementById(`team-select-0`);
     const preview = document.getElementById(`avatar-preview-0`);
 
-    const friendName = friendEl && friendEl.value.trim() ? friendEl.value.trim() : playerData?.name || 'Player';
-    const teamName = teamSel ? teamSel.value : null;
+    const friendName = friendEl?.value?.trim() || playerData?.name || 'Player';
+    const teamName = teamSel?.value;
     
     if (!teamName) {
       showNotification("Select your team", 'error');
       return;
     }
 
-    // Determine avatar: uploaded photo takes priority, otherwise team logo
     let avatarDataUrl = "";
-    if (preview && preview.dataset.uploaded === "true" && preview.src) {
+    if (preview?.dataset.uploaded === "true" && preview.src) {
       avatarDataUrl = preview.src;
     } else if (teamName && TEAM_LOGOS[teamName]) {
       avatarDataUrl = TEAM_LOGOS[teamName];
     }
 
-    const playerTeam = {
+    const team = {
       teamName,
       friendName,
       avatarDataUrl,
       budget: DEFAULT_BUDGET,
       players: [],
       foreignCount: 0,
-      totalPoints: 0,
-      socketId: socket.id
+      totalPoints: 0
     };
 
-    // Send this player's team to server
-    socket.emit('startAuction', {
-      roomId: currentRoomId,
-      playerTeam: playerTeam
-    });
-    
-    showNotification('Team submitted! Waiting for other players...', 'info');
+    socket.emit('submitTeam', { roomId: currentRoomId, team });
+    showNotification('Team submitted! Waiting for others...', 'info');
   } else {
-    // Single player mode - original logic
+    // Single player mode
+    const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
     const selectedTeams = [];
     teams = [];
-    for (let i = 0; i < count; i++) {
+    
+    for (let i = 0; i < selects.length; i++) {
       const friendEl = document.getElementById(`friend-name-${i}`);
       const teamSel = document.getElementById(`team-select-${i}`);
       const preview = document.getElementById(`avatar-preview-${i}`);
 
-      const friendName = friendEl && friendEl.value.trim() ? friendEl.value.trim() : `Friend ${i + 1}`;
-      const teamName = teamSel ? teamSel.value : null;
+      const friendName = friendEl?.value?.trim() || `Friend ${i + 1}`;
+      const teamName = teamSel?.value;
+      
       if (!teamName) {
         showNotification("Select team for all friends", 'error');
         return;
       }
       if (selectedTeams.includes(teamName)) {
-        showNotification(`${teamName} already selected — choose different IPL teams`, 'error');
+        showNotification(`${teamName} already selected`, 'error');
         return;
       }
       selectedTeams.push(teamName);
 
-      // Determine avatar: uploaded photo takes priority, otherwise team logo
       let avatarDataUrl = "";
-      if (preview && preview.dataset.uploaded === "true" && preview.src) {
+      if (preview?.dataset.uploaded === "true" && preview.src) {
         avatarDataUrl = preview.src;
       } else if (teamName && TEAM_LOGOS[teamName]) {
         avatarDataUrl = TEAM_LOGOS[teamName];
@@ -2984,7 +2971,7 @@ function startAuction() {
         budget: DEFAULT_BUDGET,
         players: [],
         foreignCount: 0,
-        totalPoints: 0,
+        totalPoints: 0
       });
     }
 
@@ -3101,55 +3088,38 @@ function bidNow(idx) {
   const t = teams[idx];
   const p = players[currentPlayerIndex];
 
-  // In multiplayer mode, only allow bidding for own team
   if (isMultiplayer && t.socketId !== socket.id) {
     showNotification("You can only bid for your own team!", 'error');
     return;
   }
 
-  // validations
   if (t.budget < currentPrice + priceIncrement) {
-    showNotification(
-      `${t.friendName} does not have enough budget (₹${
-        t.budget
-      } Cr) for next bid (₹${currentPrice + priceIncrement} Cr)`,
-      'error'
-    );
+    showNotification(`Not enough budget (₹${t.budget} Cr) for bid (₹${currentPrice + priceIncrement} Cr)`, 'error');
     return;
   }
   if (p.foreign && t.foreignCount >= MAX_FOREIGN_PER_TEAM) {
-    showNotification(
-      `${t.friendName} (${t.teamName}) already has ${MAX_FOREIGN_PER_TEAM} foreign players`,
-      'error'
-    );
+    showNotification(`Already have ${MAX_FOREIGN_PER_TEAM} foreign players`, 'error');
     return;
   }
   if (t.players.length >= MAX_PLAYERS_PER_TEAM) {
-    showNotification(
-      `${t.friendName} (${t.teamName}) already has ${MAX_PLAYERS_PER_TEAM} players`,
-      'error'
-    );
+    showNotification(`Already have ${MAX_PLAYERS_PER_TEAM} players`, 'error');
     return;
   }
 
-  // set highest bidder and increment price
   highestBidderIdx = idx;
   currentPrice += priceIncrement;
   currentPriceEl.textContent = currentPrice;
   highestBidderEl.textContent = `${t.friendName} (${t.teamName})`;
 
-  // reset countdown to full time and start it (only starts on first bid)
   countdown = NO_BID_SECONDS;
   timerEl.textContent = `${countdown}s`;
   startCountdownIfNeeded();
 
-  // Send bid to other players if in multiplayer mode
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
     socket.emit('placeBid', {
       roomId: currentRoomId,
       bidAmount: currentPrice,
-      playerName: `${t.friendName} (${t.teamName})`,
-      socketId: socket.id
+      playerName: `${t.friendName} (${t.teamName})`
     });
   }
 }
@@ -3189,22 +3159,14 @@ function assignPlayer(skipped = false) {
   }
 
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
-    // Only the room host handles player assignment and progression
-    // Check if this client is the host by checking if they created the room
-    socket.emit('playerAssigned', {
+    socket.emit('playerSold', {
       roomId: currentRoomId,
       player: p,
       winningTeam: winningTeam,
-      price: currentPrice,
-      skipped: skipped
-    });
-    socket.emit('nextPlayer', {
-      roomId: currentRoomId,
-      playerIndex: currentPlayerIndex + 1
+      price: currentPrice
     });
   } else {
-    auctionHistory.insertAdjacentHTML(
-      "afterbegin",
+    auctionHistory.insertAdjacentHTML("afterbegin",
       skipped || !winningTeam ? `<li>❌ ${p.name} - UNSOLD</li>` :
       `<li>✅ ${p.name} → ${winningTeam.teamName} sold for ₹${currentPrice} Cr</li>`
     );
@@ -3544,166 +3506,73 @@ function updateConnectionStatus(connected) {
 
 function setupSocketListeners() {
   socket.on('roomCreated', (roomId) => {
-    console.log('Room created:', roomId);
     currentRoomId = roomId;
     document.getElementById('roomId').value = roomId;
-    const statusText = `Room ${roomId} created - Share this ID with other players`;
-    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').textContent = `Room ${roomId} created`;
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
-    buildTeamRows(1); // Rebuild UI for multiplayer
+    buildTeamRows(1);
   });
 
   socket.on('joinedRoom', (data) => {
-    console.log('Successfully joined room:', data);
     currentRoomId = data.roomId;
-    const statusText = `Connected to Room ${data.roomId} - ${data.players.length} player(s)`;
-    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').textContent = `Connected to Room ${data.roomId}`;
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
-    buildTeamRows(1); // Rebuild UI for multiplayer
+    buildTeamRows(1);
   });
 
   socket.on('joinError', (error) => {
-    console.error('Join error:', error);
-    const statusEl = document.getElementById('roomStatus');
-    if (statusEl) {
-      statusEl.textContent = `Failed to join room: ${error}`;
-      statusEl.style.color = '#f44336';
-    }
-    showNotification(`Join Error: ${error}`, 'error');
-    // Don't clear room input on error so user can try again
-    isMultiplayer = false;
-    currentRoomId = null;
-  });
-
-  socket.on('playerJoined', (data) => {
-    if (currentRoomId) {
-      document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} player(s) connected`;
-      document.getElementById('roomStatus').style.color = '#4CAF50';
-      if (data.playerId !== socket.id) {
-        showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
-      }
-    }
-  });
-
-  socket.on('playerLeft', (data) => {
-    showNotification(`Player left the room`, 'info');
+    document.getElementById('roomStatus').textContent = `Error: ${error}`;
+    document.getElementById('roomStatus').style.color = '#f44336';
+    showNotification(`Error: ${error}`, 'error');
   });
 
   socket.on('waitingForPlayers', (data) => {
-    showNotification(`Waiting for players: ${data.ready}/${data.total} ready`, 'info');
-  });
-
-  socket.on('teamsUpdated', (data) => {
-    console.log('Teams updated:', data);
-    if (data.teams) {
-      // Update teams but preserve socket IDs
-      teams = data.teams;
-      updateTeamsView();
-    }
+    showNotification(`Waiting: ${data.ready}/${data.total} players ready`, 'info');
   });
 
   socket.on('auctionStarted', (data) => {
-    console.log('Auction started:', data);
-    // Sync teams and game state for ALL players
-    if (data.teams) {
-      teams = data.teams;
-      currentPlayerIndex = data.gameState.currentPlayerIndex || 0;
-      // Hide selection and show auction for all players
-      document.getElementById("team-selection").style.display = "none";
-      auctionBlock.style.display = "grid";
-      populateBidButtons();
-      updateTeamsView();
-      loadPlayer();
-      showNotification('Auction Started - All players can bid!', 'success');
-    }
-  });
-
-  socket.on('teamsUpdated', (data) => {
-    console.log('Teams updated:', data);
-    if (data.teams) {
-      // Sync team selection across all devices
-      teams = data.teams;
-      updateTeamsView();
-    }
+    teams = data.teams;
+    document.getElementById("team-selection").style.display = "none";
+    auctionBlock.style.display = "grid";
+    populateBidButtons();
+    updateTeamsView();
+    currentPlayerIndex = 0;
+    loadPlayer();
+    showNotification('Auction Started!', 'success');
   });
 
   socket.on('bidPlaced', (data) => {
-    console.log('Bid received:', data);
     currentPrice = data.bidAmount;
     highestBidderIdx = data.teamIndex;
     currentPriceEl.textContent = currentPrice;
     highestBidderEl.textContent = data.playerName;
-    
     countdown = NO_BID_SECONDS;
     timerEl.textContent = `${countdown}s`;
     startCountdownIfNeeded();
-    
     if (data.socketId !== socket.id) {
       showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
     }
   });
 
-  socket.on('playerChanged', (data) => {
-    console.log('Player changed:', data);
-    // Move to next player
-    currentPlayerIndex = data.gameState.currentPlayerIndex;
-    highestBidderIdx = -1;
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
+  socket.on('playerSold', (data) => {
+    if (data.teams) teams = data.teams;
+    currentPlayerIndex = data.nextPlayerIndex;
+    updateTeamsView();
+    auctionHistory.insertAdjacentHTML("afterbegin",
+      data.winningTeam ? 
+      `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} for ₹${data.price} Cr</li>` :
+      `<li>❌ ${data.player.name} - UNSOLD</li>`
+    );
     if (currentPlayerIndex < players.length) {
       loadPlayer();
-      showNotification('Next player loaded', 'info');
     } else {
       showNotification('Auction completed!', 'success');
       showResult();
     }
-  });
-
-  socket.on('gameStateUpdated', (gameState) => {
-    console.log('Game state updated:', gameState);
-    // Sync game state
-    if (gameState.currentPlayerIndex !== undefined) {
-      currentPlayerIndex = gameState.currentPlayerIndex;
-    }
-    if (gameState.currentPrice !== undefined) {
-      currentPrice = gameState.currentPrice;
-      currentPriceEl.textContent = currentPrice;
-    }
-  });
-
-  socket.on('playerAssigned', (data) => {
-    console.log('Player assigned:', data);
-    if (data.teams) {
-      teams = data.teams;
-    } else if (data.winningTeam && !data.skipped) {
-      const teamIndex = teams.findIndex(t => t.socketId === data.winningTeam.socketId);
-      if (teamIndex !== -1) {
-        const playerExists = teams[teamIndex].players.some(p => 
-          (typeof p === 'string' ? p : p.name) === data.player.name
-        );
-        if (!playerExists) {
-          teams[teamIndex].players.push(data.player);
-          teams[teamIndex].budget = +(teams[teamIndex].budget - data.price).toFixed(2);
-          teams[teamIndex].totalPoints += data.player.points || 0;
-          if (data.player.foreign) teams[teamIndex].foreignCount++;
-        }
-      }
-    }
-    
-    updateTeamsView();
-    updateLiveScoreboard();
-    
-    auctionHistory.insertAdjacentHTML(
-      "afterbegin",
-      data.skipped ? `<li>❌ ${data.player.name} - UNSOLD</li>` :
-      `<li>✅ ${data.player.name} → ${data.winningTeam?.teamName || 'Unknown'} sold for ₹${data.price} Cr</li>`
-    );
   });
 }
 
