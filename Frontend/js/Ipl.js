@@ -3444,28 +3444,16 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  // Connect to the same server that served this page
-  socket = io({
-    transports: ['websocket', 'polling'],
-    timeout: 10000
-  });
+  socket = io();
   
-  console.log('Connecting to server...');
-
   socket.on('connect', () => {
-    console.log('Connected to server:', socket.id);
+    console.log('Connected');
     updateConnectionStatus(true);
   });
 
   socket.on('disconnect', () => {
-    console.log('Disconnected from server');
+    console.log('Disconnected');
     updateConnectionStatus(false);
-  });
-
-  socket.on('connect_error', (error) => {
-    console.error('Connection error:', error);
-    updateConnectionStatus(false);
-    showNotification('Connection failed. Please try again.', 'error');
   });
 
   setupSocketListeners();
