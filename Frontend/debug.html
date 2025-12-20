@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Auction - Debug</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #0d1b2a; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .info { background: #2196F3; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .primary { background: #ff8c00; color: white; }
+        input { padding: 8px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🏏 IPL Auction - Multiplayer Debug</h1>
+    
+    <div id="connectionStatus" class="status info">🔄 Connecting...</div>
+    
+    <div>
+        <h3>Room Controls</h3>
+        <button class="primary" onclick="createRoom()">Create Room</button>
+        <input id="roomInput" placeholder="Enter Room ID" />
+        <button class="primary" onclick="joinRoom()">Join Room</button>
+    </div>
+    
+    <div id="roomStatus" class="status info" style="display:none;">Room Status</div>
+    
+    <div id="logs" style="margin-top: 20px; background: #1a1a1a; padding: 10px; border-radius: 5px; height: 300px; overflow-y: scroll;"></div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        let socket;
+        let currentRoomId;
+        
+        function log(message) {
+            const logs = document.getElementById('logs');
+            logs.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            logs.scrollTop = logs.scrollHeight;
+            console.log(message);
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('connectionStatus');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+        
+        function initSocket() {
+            log('🔌 Initializing socket connection...');
+            socket = io();
+            
+            socket.on('connect', () => {
+                log('✅ Connected to server: ' + socket.id);
+                updateStatus('🟢 Connected to server', 'success');
+            });
+            
+            socket.on('disconnect', () => {
+                log('❌ Disconnected from server');
+                updateStatus('🔴 Disconnected', 'error');
+            });
+            
+            socket.on('connect_error', (error) => {
+                log('❌ Connection error: ' + error);
+                updateStatus('🔴 Connection failed', 'error');
+            });
+            
+            socket.on('roomCreated', (roomId) => {
+                currentRoomId = roomId;
+                log('🏠 Room created: ' + roomId);
+                document.getElementById('roomStatus').style.display = 'block';
+                document.getElementById('roomStatus').textContent = 'Room Created: ' + roomId;
+                document.getElementById('roomStatus').className = 'status success';
+            });
+            
+            socket.on('joinedRoom', (data) => {
+                currentRoomId = data.roomId;
+                log('🎮 Joined room: ' + data.roomId);
+                document.getElementById('roomStatus').style.display = 'block';
+                document.getElementById('roomStatus').textContent = 'Joined Room: ' + data.roomId;
+                document.getElementById('roomStatus').className = 'status success';
+            });
+            
+            socket.on('joinError', (error) => {
+                log('❌ Join error: ' + error);
+                document.getElementById('roomStatus').style.display = 'block';
+                document.getElementById('roomStatus').textContent = 'Error: ' + error;
+                document.getElementById('roomStatus').className = 'status error';
+            });
+        }
+        
+        function createRoom() {
+            if (!socket || !socket.connected) {
+                log('❌ Not connected to server');
+                return;
+            }
+            
+            const userData = {
+                name: 'Test Player',
+                email: 'test@example.com',
+                uid: 'test123'
+            };
+            
+            log('🏠 Creating room...');
+            socket.emit('createRoom', userData);
+        }
+        
+        function joinRoom() {
+            if (!socket || !socket.connected) {
+                log('❌ Not connected to server');
+                return;
+            }
+            
+            const roomId = document.getElementById('roomInput').value.trim().toUpperCase();
+            if (!roomId) {
+                log('❌ Please enter a room ID');
+                return;
+            }
+            
+            const userData = {
+                name: 'Test Player 2',
+                email: 'test2@example.com',
+                uid: 'test456'
+            };
+            
+            log('🎮 Joining room: ' + roomId);
+            socket.emit('joinRoom', { roomId, userData });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Debug page loaded');
+            initSocket();
+        });
+    </script>
+</body>
+</html>

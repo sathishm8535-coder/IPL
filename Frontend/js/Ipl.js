@@ -3453,18 +3453,15 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
-  console.log('Initializing socket connection...');
-  socket = io();
+  console.log('🔌 Initializing socket connection...');
+  socket = io({
+    transports: ['websocket', 'polling'],
+    timeout: 5000
+  });
   
   socket.on('connect', () => {
     console.log('✅ Socket connected:', socket.id);
     updateConnectionStatus(true);
-    // Test connection
-    socket.emit('ping');
-  });
-
-  socket.on('pong', () => {
-    console.log('✅ Server responded to ping');
   });
 
   socket.on('disconnect', () => {
@@ -3730,7 +3727,7 @@ function showNotification(message, type = 'info') {
 
 // Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, initializing multiplayer...');
+  console.log('🎮 DOM loaded, initializing multiplayer...');
   initializeMultiplayer();
 });
 
