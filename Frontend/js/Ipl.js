@@ -3491,15 +3491,21 @@ let playerData = null;
 
 // Initialize socket connection
 function initializeSocket() {
+  console.log('Initializing socket connection...');
   socket = io();
   
   socket.on('connect', () => {
-    console.log('Connected');
+    console.log('✅ Socket connected:', socket.id);
     updateConnectionStatus(true);
   });
 
   socket.on('disconnect', () => {
-    console.log('Disconnected');
+    console.log('❌ Socket disconnected');
+    updateConnectionStatus(false);
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('❌ Socket connection error:', error);
     updateConnectionStatus(false);
   });
 
@@ -3703,11 +3709,19 @@ function setupSocketListeners() {
 
 // Get user info and initialize socket
 function initializeMultiplayer() {
+  console.log('Initializing multiplayer...');
   const userInfo = localStorage.getItem('userInfo');
+  console.log('User info from localStorage:', userInfo);
+  
   if (userInfo) {
     playerData = JSON.parse(userInfo);
-    initializeSocket();
+    console.log('Parsed player data:', playerData);
+  } else {
+    console.log('No user info found, using default');
+    playerData = { name: 'Anonymous', email: '', uid: 'guest' };
   }
+  
+  initializeSocket();
 }
 
 // Get buttons & input
@@ -3718,12 +3732,16 @@ const roomInput = document.getElementById("roomId");
 // Create Room button click
 if (createBtn) {
   createBtn.addEventListener("click", () => {
+    console.log('Create room button clicked');
+    
     if (!socket) {
+      console.error('Socket not initialized');
       showNotification('Socket not initialized. Please refresh the page.', 'error');
       return;
     }
     
     if (!socket.connected) {
+      console.error('Socket not connected');
       showNotification('Not connected to server. Trying to reconnect...', 'error');
       socket.connect();
       return;
@@ -3735,7 +3753,7 @@ if (createBtn) {
       uid: playerData?.uid || socket.id
     };
     
-    console.log('Creating room with userData:', userData);
+    console.log('Emitting createRoom with userData:', userData);
     socket.emit("createRoom", userData);
   });
 }

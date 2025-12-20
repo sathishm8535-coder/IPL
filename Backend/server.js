@@ -47,9 +47,11 @@ app.get('/api/rooms', (req, res) => {
 const rooms = new Map();
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('✅ User connected:', socket.id);
 
   socket.on('createRoom', (userData) => {
+    console.log('🏠 Create room request from:', socket.id, 'with data:', userData);
+    
     let roomId;
     do {
       roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -74,22 +76,29 @@ io.on('connection', (socket) => {
     rooms.set(roomId, roomData);
     socket.join(roomId);
     socket.emit('roomCreated', roomId);
-    console.log(`Room ${roomId} created by ${socket.id}`);
+    console.log(`✅ Room ${roomId} created by ${socket.id}. Total rooms: ${rooms.size}`);
   });
 
   socket.on('joinRoom', (data) => {
+    console.log('🚪 Join room request from:', socket.id, 'with data:', data);
+    
     if (!data || !data.roomId) {
+      console.log('❌ No room ID provided');
       socket.emit('joinError', 'Room ID required');
       return;
     }
     
     const roomId = data.roomId.toString().toUpperCase().trim();
+    console.log('🔍 Looking for room:', roomId);
+    console.log('📋 Available rooms:', Array.from(rooms.keys()));
     
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
+      console.log('✅ Room found! Current players:', room.players.length);
       
       if (!room.players.find(p => p.socketId === socket.id)) {
         room.players.push({ socketId: socket.id, ...data.userData });
+        console.log('👥 Player added to room. Total players:', room.players.length);
       }
       
       socket.join(roomId);
@@ -104,8 +113,9 @@ io.on('connection', (socket) => {
         selectedTeams: room.selectedTeams || []
       });
       
-      console.log(`Player ${socket.id} joined room ${roomId}`);
+      console.log(`✅ Player ${socket.id} successfully joined room ${roomId}`);
     } else {
+      console.log('❌ Room not found:', roomId);
       socket.emit('joinError', 'Room not found');
     }
   });
