@@ -2937,11 +2937,6 @@ function startAuction() {
       roomId: currentRoomId,
       teams: teams
     });
-    // Also sync teams immediately
-    socket.emit('syncTeams', {
-      roomId: currentRoomId,
-      teams: teams
-    });
   } else {
     // Single player mode
     document.getElementById("team-selection").style.display = "none";
@@ -3101,7 +3096,6 @@ function assignPlayer(skipped = false) {
   const p = players[currentPlayerIndex];
   let winningTeam = null;
 
-  // clear timer if running
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -3109,42 +3103,18 @@ function assignPlayer(skipped = false) {
 
   if (highestBidderIdx !== -1 && !skipped) {
     const team = teams[highestBidderIdx];
-    // final price is currentPrice (last bid value)
-    if (team.budget < currentPrice) {
-      auctionHistory.insertAdjacentHTML(
-        "afterbegin",
-        `<li>⚠ ${p.name} - highest bidder ${team.friendName} couldn't afford ₹${currentPrice} Cr, marked UNSOLD</li>`
-      );
-    } else if (p.foreign && team.foreignCount >= MAX_FOREIGN_PER_TEAM) {
-      auctionHistory.insertAdjacentHTML(
-        "afterbegin",
-        `<li>⚠ ${p.name} - ${team.friendName} already has ${MAX_FOREIGN_PER_TEAM} foreign players</li>`
-      );
-    } else if (team.players.length >= MAX_PLAYERS_PER_TEAM) {
-      auctionHistory.insertAdjacentHTML(
-        "afterbegin",
-        `<li>⚠ ${p.name} - ${team.friendName} already has ${MAX_PLAYERS_PER_TEAM} players</li>`
-      );
-    } else {
+    if (team.budget >= currentPrice && 
+        (!p.foreign || team.foreignCount < MAX_FOREIGN_PER_TEAM) &&
+        team.players.length < MAX_PLAYERS_PER_TEAM) {
       team.players.push(p);
       team.budget = +(team.budget - currentPrice).toFixed(2);
       team.totalPoints += p.points || 0;
       if (p.foreign) team.foreignCount++;
       winningTeam = team;
-      auctionHistory.insertAdjacentHTML(
-        "afterbegin",
-        `<li>✅ ${p.name} → ${team.teamName} (${team.friendName}) sold for ₹${currentPrice} Cr (+${p.points || 0} pts)</li>`
-      );
       updateLiveScoreboard();
     }
-  } else {
-    auctionHistory.insertAdjacentHTML(
-      "afterbegin",
-      `<li>❌ ${p.name} - UNSOLD</li>`
-    );
   }
 
-  // Send player assignment in multiplayer mode BEFORE moving to next player
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
     socket.emit('playerAssigned', {
       roomId: currentRoomId,
@@ -3153,28 +3123,24 @@ function assignPlayer(skipped = false) {
       price: currentPrice,
       skipped: skipped
     });
-  }
-
-  // reset and move to next player
-  highestBidderIdx = -1;
-  currentPlayerIndex++;
-  updateTeamsView();
-
-  // Send next player event in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
-      playerIndex: currentPlayerIndex
+      playerIndex: currentPlayerIndex + 1
     });
-  }
-
-  // Auto move to next player (only in single player mode)
-  if (!isMultiplayer) {
+  } else {
+    auctionHistory.insertAdjacentHTML(
+      "afterbegin",
+      skipped || !winningTeam ? `<li>❌ ${p.name} - UNSOLD</li>` :
+      `<li>✅ ${p.name} → ${winningTeam.teamName} sold for ₹${currentPrice} Cr</li>`
+    );
+    highestBidderIdx = -1;
+    currentPlayerIndex++;
+    updateTeamsView();
     setTimeout(() => {
       if (currentPlayerIndex < players.length) {
         loadPlayer();
       } else {
-        showNotification("Auction completed for all players in the list.", 'success');
+        showNotification("Auction completed!", 'success');
         showResult();
       }
     }, 1000);
@@ -3187,39 +3153,36 @@ function skipCurrentPlayer() {
     showNotification("No more players to skip.", 'info');
     return;
   }
-  const p = players[currentPlayerIndex];
-  auctionHistory.insertAdjacentHTML(
-    "afterbegin",
-    `<li>⏭ ${p.name} - SKIPPED (moved to next)</li>`
-  );
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
   }
-  highestBidderIdx = -1;
-  currentPlayerIndex++;
   
-  // Send next player event in multiplayer mode
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('playerAssigned', {
+      roomId: currentRoomId,
+      player: players[currentPlayerIndex],
+      winningTeam: null,
+      price: 0,
+      skipped: true
+    });
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
-      playerIndex: currentPlayerIndex
+      playerIndex: currentPlayerIndex + 1
     });
-  }
-  
-  updateTeamsView();
-  if (currentPlayerIndex < players.length) {
-    loadPlayer();
   } else {
-    showNotification("Auction completed for all players in the list.", 'success');
-    highestBidderEl.textContent = "-";
-    timerEl.textContent = "0s";
-    
-    // Auto show final results when auction ends
-    showResult();
-    const showWinnerBtn = document.getElementById("showWinnerBtn");
-    if (showWinnerBtn) {
-      showWinnerBtn.style.display = "inline-block";
+    auctionHistory.insertAdjacentHTML(
+      "afterbegin",
+      `<li>⏭ ${players[currentPlayerIndex].name} - SKIPPED</li>`
+    );
+    highestBidderIdx = -1;
+    currentPlayerIndex++;
+    updateTeamsView();
+    if (currentPlayerIndex < players.length) {
+      loadPlayer();
+    } else {
+      showNotification("Auction completed!", 'success');
+      showResult();
     }
   }
 }
@@ -3574,18 +3537,16 @@ function setupSocketListeners() {
 
   socket.on('bidPlaced', (data) => {
     console.log('Bid received:', data);
-    // Only update if this bid is from another player
+    currentPrice = data.bidAmount;
+    highestBidderIdx = data.teamIndex;
+    currentPriceEl.textContent = currentPrice;
+    highestBidderEl.textContent = data.playerName;
+    
+    countdown = NO_BID_SECONDS;
+    timerEl.textContent = `${countdown}s`;
+    startCountdownIfNeeded();
+    
     if (data.socketId !== socket.id) {
-      currentPrice = data.bidAmount;
-      highestBidderIdx = data.teamIndex;
-      currentPriceEl.textContent = currentPrice;
-      highestBidderEl.textContent = data.playerName;
-      
-      // Reset timer
-      countdown = NO_BID_SECONDS;
-      timerEl.textContent = `${countdown}s`;
-      startCountdownIfNeeded();
-      
       showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
     }
   });
@@ -3623,10 +3584,8 @@ function setupSocketListeners() {
   socket.on('playerAssigned', (data) => {
     console.log('Player assigned:', data);
     if (data.winningTeam && !data.skipped) {
-      // Find the team in local teams array and update it
       const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
       if (teamIndex !== -1) {
-        // Only add if player not already in team
         const playerExists = teams[teamIndex].players.some(p => 
           (typeof p === 'string' ? p : p.name) === data.player.name
         );
@@ -3640,6 +3599,12 @@ function setupSocketListeners() {
         updateLiveScoreboard();
       }
     }
+    
+    auctionHistory.insertAdjacentHTML(
+      "afterbegin",
+      data.skipped ? `<li>❌ ${data.player.name} - UNSOLD</li>` :
+      `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} sold for ₹${data.price} Cr</li>`
+    );
   });
 }
 
