@@ -151,6 +151,22 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Another process is listening on this port.`);
+    console.error('On Windows you can run: netstat -ano | findstr :'+PORT+' to find the PID, then: taskkill /PID <pid> /F');
+    process.exit(1);
+  }
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🏏 IPL Auction Server running on port ${PORT}`);
+});
+
+process.on('SIGINT', () => {
+  console.log('\nShutting down server...');
+  server.close(() => process.exit(0));
 });
