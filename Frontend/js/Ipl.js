@@ -3479,10 +3479,15 @@ function initializeSocket() {
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
-    timeout: 20000,
+    timeout: 30000,
     reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 2000
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    maxReconnectionAttempts: 10,
+    randomizationFactor: 0.5,
+    forceNew: false,
+    upgrade: true
   });
   
   console.log('Connecting to server:', serverUrl);
@@ -3493,8 +3498,12 @@ function initializeSocket() {
     updateServerStatus('✅ Connected to server', '#4CAF50');
   });
 
-  socket.on('disconnect', () => {
-    console.log('Disconnected from server');
+  socket.on('disconnect', (reason) => {
+    console.log('Disconnected from server:', reason);
+    if (reason === 'io server disconnect') {
+      // Server disconnected, try to reconnect
+      socket.connect();
+    }
     updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
   });
 
@@ -3503,8 +3512,23 @@ function initializeSocket() {
     updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
   });
 
-  socket.on('reconnect', () => {
+  socket.on('reconnect', (attemptNumber) => {
+    console.log('Reconnected after', attemptNumber, 'attempts');
     updateServerStatus('✅ Reconnected to server', '#4CAF50');
+  });
+  
+  socket.on('reconnect_attempt', (attemptNumber) => {
+    console.log('Reconnection attempt:', attemptNumber);
+    updateServerStatus(`🔄 Reconnecting... (${attemptNumber}/10)`, '#ff8c00');
+  });
+  
+  socket.on('reconnect_failed', () => {
+    console.log('Failed to reconnect');
+    updateServerStatus('❌ Failed to reconnect - Please refresh', '#f44336');
+  });
+  
+  socket.on('connectionConfirmed', (data) => {
+    console.log('Connection confirmed:', data);
   });
 
   setupSocketListeners();
@@ -3696,19 +3720,23 @@ const roomInput = document.getElementById("roomId");
 if (createBtn) {
   createBtn.addEventListener("click", () => {
     if (!socket || !socket.connected) {
+      showNotification('Connecting to server...', 'info');
       initializeSocket();
-      setTimeout(() => {
-        if (socket && socket.connected) {
-          const userData = {
-            name: playerData?.name || 'Anonymous',
-            email: playerData?.email || '',
-            uid: playerData?.uid || Date.now()
-          };
-          socket.emit("createRoom", userData);
-        } else {
-          showNotification('Failed to connect to server', 'error');
-        }
-      }, 2000);
+      
+      // Wait for connection with timeout
+      const connectionTimeout = setTimeout(() => {
+        showNotification('Connection timeout - Please check server', 'error');
+      }, 10000);
+      
+      socket.on('connect', () => {
+        clearTimeout(connectionTimeout);
+        const userData = {
+          name: playerData?.name || 'Anonymous',
+          email: playerData?.email || '',
+          uid: playerData?.uid || Date.now()
+        };
+        socket.emit("createRoom", userData);
+      });
     } else {
       const userData = {
         name: playerData?.name || 'Anonymous',
@@ -3730,19 +3758,23 @@ if (joinBtn) {
     }
     
     if (!socket || !socket.connected) {
+      showNotification('Connecting to server...', 'info');
       initializeSocket();
-      setTimeout(() => {
-        if (socket && socket.connected) {
-          const userData = {
-            name: playerData?.name || 'Anonymous',
-            email: playerData?.email || '',
-            uid: playerData?.uid || Date.now()
-          };
-          socket.emit("joinRoom", { roomId: id, userData });
-        } else {
-          showNotification('Failed to connect to server', 'error');
-        }
-      }, 2000);
+      
+      // Wait for connection with timeout
+      const connectionTimeout = setTimeout(() => {
+        showNotification('Connection timeout - Please check server', 'error');
+      }, 10000);
+      
+      socket.on('connect', () => {
+        clearTimeout(connectionTimeout);
+        const userData = {
+          name: playerData?.name || 'Anonymous',
+          email: playerData?.email || '',
+          uid: playerData?.uid || Date.now()
+        };
+        socket.emit("joinRoom", { roomId: id, userData });
+      });
     } else {
       const userData = {
         name: playerData?.name || 'Anonymous',
@@ -3795,16 +3827,42 @@ function showNotification(message, type = 'info') {
 
 // Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if server is running first
-  fetch('/api/rooms')
-    .then(() => {
-      console.log('Server is running');
-      setTimeout(initializeMultiplayer, 1000);
+  // Check if server is running first with retry logic
+  let retryCount = 0;
+  const maxRetries = 3;
+  
+  function checkServer() {
+    fetch('/api/rooms', { 
+      method: 'GET',
+      timeout: 5000,
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
     })
-    .catch(() => {
-      console.log('Server not running - multiplayer disabled');
-      updateServerStatus('❌ Server not running', '#f44336');
+    .then(response => {
+      if (response.ok) {
+        console.log('Server is running');
+        updateServerStatus('✅ Server ready', '#4CAF50');
+        setTimeout(initializeMultiplayer, 500);
+      } else {
+        throw new Error('Server responded with error');
+      }
+    })
+    .catch(error => {
+      console.log('Server check failed:', error);
+      retryCount++;
+      
+      if (retryCount < maxRetries) {
+        updateServerStatus(`🔄 Checking server... (${retryCount}/${maxRetries})`, '#ff8c00');
+        setTimeout(checkServer, 2000);
+      } else {
+        console.log('Server not running - multiplayer disabled');
+        updateServerStatus('❌ Server not running - Start server for multiplayer', '#f44336');
+      }
     });
+  }
+  
+  checkServer();
 });
 
 

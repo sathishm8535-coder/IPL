@@ -9,8 +9,14 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 30000,
+  allowEIO3: true
 });
 
 app.use(cors());
@@ -55,6 +61,9 @@ setInterval(() => {
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+  
+  // Send connection confirmation
+  socket.emit('connectionConfirmed', { socketId: socket.id, timestamp: Date.now() });
 
   socket.on('createRoom', (userData) => {
     // Generate unique room ID
@@ -306,4 +315,11 @@ server.listen(PORT, HOST, () => {
   console.log(`🔐 Login Page: http://localhost:${PORT}`);
   console.log(`🎮 Game URL: http://localhost:${PORT}/game`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Please close other applications using this port.`);
+    process.exit(1);
+  } else {
+    console.error('❌ Server error:', err);
+  }
 });
