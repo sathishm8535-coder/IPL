@@ -3473,62 +3473,37 @@ let selectedTeamsInRoom = [];
 let playersInRoom = [];
 let isRoomHost = false;
 
-// Initialize socket connection
+// Initialize socket connection with aggressive retry
 function initializeSocket() {
-  const serverUrl = window.location.origin;
+  if (socket && socket.connected) return;
   
-  socket = io(serverUrl, {
-    transports: ['websocket', 'polling'],
-    timeout: 30000,
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+  
+  socket = io(window.location.origin, {
+    transports: ['polling'],
+    timeout: 5000,
     reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    maxReconnectionAttempts: 10,
-    randomizationFactor: 0.5,
-    forceNew: false,
-    upgrade: true
+    reconnectionAttempts: 50,
+    reconnectionDelay: 500,
+    forceNew: true
   });
   
-  console.log('Connecting to server:', serverUrl);
-  updateServerStatus('🔄 Connecting to server...', '#ff8c00');
+  updateServerStatus('🔄 Connecting...', '#ff8c00');
 
   socket.on('connect', () => {
-    console.log('Connected to server:', socket.id);
-    updateServerStatus('✅ Connected to server', '#4CAF50');
+    updateServerStatus('✅ Connected', '#4CAF50');
   });
 
-  socket.on('disconnect', (reason) => {
-    console.log('Disconnected from server:', reason);
-    if (reason === 'io server disconnect') {
-      // Server disconnected, try to reconnect
-      socket.connect();
-    }
+  socket.on('disconnect', () => {
     updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
+    setTimeout(() => socket.connect(), 1000);
   });
 
-  socket.on('connect_error', (error) => {
-    console.log('Connection failed:', error);
+  socket.on('connect_error', () => {
     updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
-  });
-
-  socket.on('reconnect', (attemptNumber) => {
-    console.log('Reconnected after', attemptNumber, 'attempts');
-    updateServerStatus('✅ Reconnected to server', '#4CAF50');
-  });
-  
-  socket.on('reconnect_attempt', (attemptNumber) => {
-    console.log('Reconnection attempt:', attemptNumber);
-    updateServerStatus(`🔄 Reconnecting... (${attemptNumber}/10)`, '#ff8c00');
-  });
-  
-  socket.on('reconnect_failed', () => {
-    console.log('Failed to reconnect');
-    updateServerStatus('❌ Failed to reconnect - Please refresh', '#f44336');
-  });
-  
-  socket.on('connectionConfirmed', (data) => {
-    console.log('Connection confirmed:', data);
   });
 
   setupSocketListeners();
@@ -3719,25 +3694,40 @@ const roomInput = document.getElementById("roomId");
 // Create Room button click
 if (createBtn) {
   createBtn.addEventListener("click", () => {
+    console.log('Create room clicked');
+    
     if (!socket || !socket.connected) {
+      console.log('Socket not connected, initializing...');
       showNotification('Connecting to server...', 'info');
+      
       initializeSocket();
       
-      // Wait for connection with timeout
-      const connectionTimeout = setTimeout(() => {
-        showNotification('Connection timeout - Please check server', 'error');
-      }, 10000);
+      // Wait for connection with multiple attempts
+      let attempts = 0;
+      const maxAttempts = 10;
       
-      socket.on('connect', () => {
-        clearTimeout(connectionTimeout);
-        const userData = {
-          name: playerData?.name || 'Anonymous',
-          email: playerData?.email || '',
-          uid: playerData?.uid || Date.now()
-        };
-        socket.emit("createRoom", userData);
-      });
+      const waitForConnection = () => {
+        attempts++;
+        console.log(`Waiting for connection, attempt ${attempts}`);
+        
+        if (socket && socket.connected) {
+          console.log('Socket connected, creating room');
+          const userData = {
+            name: playerData?.name || 'Anonymous',
+            email: playerData?.email || '',
+            uid: playerData?.uid || Date.now()
+          };
+          socket.emit("createRoom", userData);
+        } else if (attempts < maxAttempts) {
+          setTimeout(waitForConnection, 1000);
+        } else {
+          showNotification('Connection timeout - Please try again', 'error');
+        }
+      };
+      
+      setTimeout(waitForConnection, 1000);
     } else {
+      console.log('Socket already connected, creating room');
       const userData = {
         name: playerData?.name || 'Anonymous',
         email: playerData?.email || '',
@@ -3757,25 +3747,40 @@ if (joinBtn) {
       return;
     }
     
+    console.log('Join room clicked with ID:', id);
+    
     if (!socket || !socket.connected) {
+      console.log('Socket not connected, initializing...');
       showNotification('Connecting to server...', 'info');
+      
       initializeSocket();
       
-      // Wait for connection with timeout
-      const connectionTimeout = setTimeout(() => {
-        showNotification('Connection timeout - Please check server', 'error');
-      }, 10000);
+      // Wait for connection with multiple attempts
+      let attempts = 0;
+      const maxAttempts = 10;
       
-      socket.on('connect', () => {
-        clearTimeout(connectionTimeout);
-        const userData = {
-          name: playerData?.name || 'Anonymous',
-          email: playerData?.email || '',
-          uid: playerData?.uid || Date.now()
-        };
-        socket.emit("joinRoom", { roomId: id, userData });
-      });
+      const waitForConnection = () => {
+        attempts++;
+        console.log(`Waiting for connection, attempt ${attempts}`);
+        
+        if (socket && socket.connected) {
+          console.log('Socket connected, joining room');
+          const userData = {
+            name: playerData?.name || 'Anonymous',
+            email: playerData?.email || '',
+            uid: playerData?.uid || Date.now()
+          };
+          socket.emit("joinRoom", { roomId: id, userData });
+        } else if (attempts < maxAttempts) {
+          setTimeout(waitForConnection, 1000);
+        } else {
+          showNotification('Connection timeout - Please try again', 'error');
+        }
+      };
+      
+      setTimeout(waitForConnection, 1000);
     } else {
+      console.log('Socket already connected, joining room');
       const userData = {
         name: playerData?.name || 'Anonymous',
         email: playerData?.email || '',
@@ -3827,42 +3832,17 @@ function showNotification(message, type = 'info') {
 
 // Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if server is running first with retry logic
-  let retryCount = 0;
-  const maxRetries = 3;
-  
-  function checkServer() {
-    fetch('/api/rooms', { 
-      method: 'GET',
-      timeout: 5000,
-      headers: {
-        'Cache-Control': 'no-cache'
-      }
-    })
-    .then(response => {
-      if (response.ok) {
-        console.log('Server is running');
-        updateServerStatus('✅ Server ready', '#4CAF50');
-        setTimeout(initializeMultiplayer, 500);
+  setTimeout(() => {
+    initializeMultiplayer();
+    // Force socket connection every 3 seconds until connected
+    const forceConnect = setInterval(() => {
+      if (!socket || !socket.connected) {
+        initializeSocket();
       } else {
-        throw new Error('Server responded with error');
+        clearInterval(forceConnect);
       }
-    })
-    .catch(error => {
-      console.log('Server check failed:', error);
-      retryCount++;
-      
-      if (retryCount < maxRetries) {
-        updateServerStatus(`🔄 Checking server... (${retryCount}/${maxRetries})`, '#ff8c00');
-        setTimeout(checkServer, 2000);
-      } else {
-        console.log('Server not running - multiplayer disabled');
-        updateServerStatus('❌ Server not running - Start server for multiplayer', '#f44336');
-      }
-    });
-  }
-  
-  checkServer();
+    }, 3000);
+  }, 1000);
 });
 
 
