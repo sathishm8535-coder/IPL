@@ -105,15 +105,21 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinRoom', (data) => {
+    console.log('JOIN ROOM:', data);
+    
     if (!data || !data.roomId) {
+      console.log('No room ID provided');
       socket.emit('joinError', 'Room ID required');
       return;
     }
     
     const roomId = data.roomId.toString().toUpperCase().trim();
+    console.log('Looking for room:', roomId);
+    console.log('Available rooms:', Array.from(rooms.keys()));
     
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
+      console.log('Room found! Players:', room.players.length);
       
       if (!room.players.find(p => p.socketId === socket.id)) {
         room.players.push({ socketId: socket.id, ...data.userData });
@@ -133,9 +139,10 @@ io.on('connection', (socket) => {
         playerCount: room.players.length
       });
       
-      console.log(`Player joined room ${roomId}`);
+      console.log(`Player joined room ${roomId} successfully`);
     } else {
-      socket.emit('joinError', 'Room not found');
+      console.log('Room not found! Available:', Array.from(rooms.keys()));
+      socket.emit('joinError', `Room ${roomId} not found`);
     }
   });
 
