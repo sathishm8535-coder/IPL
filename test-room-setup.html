@@ -66,9 +66,24 @@
             <option value="Chennai Super Kings">Chennai Super Kings</option>
             <option value="Mumbai Indians">Mumbai Indians</option>
             <option value="Royal Challengers Bengaluru">Royal Challengers Bengaluru</option>
+            <option value="Delhi Capitals">Delhi Capitals</option>
+            <option value="Kolkata Knight Riders">Kolkata Knight Riders</option>
         </select>
         <button onclick="selectTestTeam()">Select Team</button>
         <div id="teamStatus" class="status">No team selected</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Auction Test</h2>
+        <button onclick="startTestAuction()">Start Auction</button>
+        <button onclick="placeBid()">Place Test Bid (₹5 Cr)</button>
+        <div id="auctionStatus" class="status">Auction not started</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Room Info</h2>
+        <button onclick="getRoomInfo()">Get Room Info</button>
+        <div id="roomInfo" class="status">Click to get room information</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -77,17 +92,11 @@
         let currentRoomId = null;
 
         function testConnection() {
-            const serverUrl = window.location.origin;
-            socket = io(serverUrl);
+            socket = io();
             
             socket.on('connect', () => {
-                document.getElementById('serverStatus').innerHTML = '✅ Connected to server: ' + socket.id;
+                document.getElementById('serverStatus').innerHTML = '✅ Connected: ' + socket.id;
                 document.getElementById('serverStatus').style.background = 'rgba(76, 175, 80, 0.2)';
-            });
-
-            socket.on('disconnect', () => {
-                document.getElementById('serverStatus').innerHTML = '❌ Disconnected from server';
-                document.getElementById('serverStatus').style.background = 'rgba(244, 67, 54, 0.2)';
             });
 
             socket.on('roomCreated', (data) => {
@@ -99,85 +108,88 @@
 
             socket.on('joinedRoom', (data) => {
                 currentRoomId = data.roomId;
-                document.getElementById('roomStatus').innerHTML = `✅ Joined Room: ${data.roomId} (${data.players.length} players)`;
+                document.getElementById('roomStatus').innerHTML = `✅ Joined: ${data.roomId} (${data.players.length} players)`;
                 document.getElementById('roomStatus').style.background = 'rgba(76, 175, 80, 0.2)';
             });
 
             socket.on('joinError', (error) => {
-                document.getElementById('roomStatus').innerHTML = `❌ Join Error: ${error}`;
+                document.getElementById('roomStatus').innerHTML = `❌ Error: ${error}`;
                 document.getElementById('roomStatus').style.background = 'rgba(244, 67, 54, 0.2)';
             });
 
             socket.on('teamSelected', (data) => {
-                document.getElementById('teamStatus').innerHTML = `Team selected: ${data.teamName} by ${data.playerInfo.friendName}`;
+                document.getElementById('teamStatus').innerHTML = `Team: ${data.teamName}`;
+            });
+
+            socket.on('auctionStarted', (data) => {
+                document.getElementById('auctionStatus').innerHTML = `✅ Auction Started (${data.teams.length} teams)`;
+                document.getElementById('auctionStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+
+            socket.on('bidPlaced', (data) => {
+                document.getElementById('auctionStatus').innerHTML = `💰 Bid: ₹${data.bidAmount} Cr by ${data.playerName}`;
             });
         }
 
         function createTestRoom() {
-            if (!socket || !socket.connected) {
-                alert('Connect to server first!');
-                return;
-            }
-            
-            const userData = {
-                name: 'Test Player',
-                email: 'test@example.com',
-                uid: 'test123'
-            };
-            
-            socket.emit('createRoom', userData);
+            if (!socket?.connected) return alert('Connect first!');
+            socket.emit('createRoom', { name: 'Test Player', email: 'test@test.com', uid: 'test123' });
         }
 
         function joinTestRoom() {
-            if (!socket || !socket.connected) {
-                alert('Connect to server first!');
-                return;
-            }
-            
+            if (!socket?.connected) return alert('Connect first!');
             const roomId = document.getElementById('testRoomId').value.trim();
-            if (!roomId) {
-                alert('Enter a Room ID!');
-                return;
-            }
-            
-            const userData = {
-                name: 'Test Player 2',
-                email: 'test2@example.com',
-                uid: 'test456'
-            };
-            
-            socket.emit('joinRoom', { roomId, userData });
+            if (!roomId) return alert('Enter Room ID!');
+            socket.emit('joinRoom', { roomId, userData: { name: 'Test Player 2', email: 'test2@test.com', uid: 'test456' } });
         }
 
         function selectTestTeam() {
-            if (!socket || !socket.connected || !currentRoomId) {
-                alert('Connect to server and join a room first!');
-                return;
-            }
-            
+            if (!socket?.connected || !currentRoomId) return alert('Connect and join room first!');
             const teamName = document.getElementById('teamSelect').value;
-            if (!teamName) {
-                alert('Select a team first!');
-                return;
-            }
-            
+            if (!teamName) return alert('Select team first!');
             socket.emit('selectTeam', {
                 roomId: currentRoomId,
-                teamName: teamName,
-                playerInfo: {
-                    friendName: 'Test Friend',
-                    socketId: socket.id,
-                    index: 0
-                }
+                teamName,
+                playerInfo: { friendName: 'Test Friend', socketId: socket.id, index: 0 }
             });
-            
-            document.getElementById('teamStatus').innerHTML = `Selected: ${teamName}`;
         }
 
-        // Auto-connect on page load
-        window.onload = () => {
-            setTimeout(testConnection, 1000);
-        };
+        function startTestAuction() {
+            if (!socket?.connected || !currentRoomId) return alert('Connect and join room first!');
+            socket.emit('startAuction', {
+                roomId: currentRoomId,
+                teams: [
+                    { teamName: 'Chennai Super Kings', budget: 10000, players: [] },
+                    { teamName: 'Mumbai Indians', budget: 10000, players: [] }
+                ]
+            });
+        }
+
+        function placeBid() {
+            if (!socket?.connected || !currentRoomId) return alert('Connect and join room first!');
+            socket.emit('placeBid', {
+                roomId: currentRoomId,
+                bidAmount: 5,
+                teamIndex: 0,
+                playerName: 'Test Player',
+                socketId: socket.id
+            });
+        }
+
+        function getRoomInfo() {
+            fetch('/api/rooms')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('roomInfo').innerHTML = 
+                        `Active Rooms: ${data.total}<br>` +
+                        data.rooms.map(room => `Room ${room.id}: ${room.players} players`).join('<br>');
+                })
+                .catch(() => {
+                    document.getElementById('roomInfo').innerHTML = 'Error fetching room info';
+                });
+        }
+
+        window.onload = () => setTimeout(testConnection, 1000);
     </script>
 </body>
 </html>
