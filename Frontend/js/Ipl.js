@@ -3479,11 +3479,14 @@ function initializeSocket() {
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
-    timeout: 10000
+    timeout: 20000,
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 2000
   });
   
   console.log('Connecting to server:', serverUrl);
-  updateServerStatus('Connecting to server...', '#ff8c00');
+  updateServerStatus('🔄 Connecting to server...', '#ff8c00');
 
   socket.on('connect', () => {
     console.log('Connected to server:', socket.id);
@@ -3492,12 +3495,16 @@ function initializeSocket() {
 
   socket.on('disconnect', () => {
     console.log('Disconnected from server');
-    updateServerStatus('❌ Disconnected from server', '#f44336');
+    updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
   });
 
-  socket.on('connect_error', () => {
-    console.log('Connection failed');
-    updateServerStatus('❌ Connection failed', '#f44336');
+  socket.on('connect_error', (error) => {
+    console.log('Connection failed:', error);
+    updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
+  });
+
+  socket.on('reconnect', () => {
+    updateServerStatus('✅ Reconnected to server', '#4CAF50');
   });
 
   setupSocketListeners();
@@ -3788,7 +3795,16 @@ function showNotification(message, type = 'info') {
 
 // Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initializeMultiplayer, 1000);
+  // Check if server is running first
+  fetch('/api/rooms')
+    .then(() => {
+      console.log('Server is running');
+      setTimeout(initializeMultiplayer, 1000);
+    })
+    .catch(() => {
+      console.log('Server not running - multiplayer disabled');
+      updateServerStatus('❌ Server not running', '#f44336');
+    });
 });
 
 

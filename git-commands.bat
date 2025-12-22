@@ -1,13 +1,23 @@
 @echo off
+echo Checking git status...
+git status
+
+echo Setting up remote if needed...
+git remote -v
+git remote set-url origin https://github.com/sathishm8535-coder/IPL.git
+
 echo Adding all changes to git...
 git add .
 
 echo Committing changes...
-git commit -m "Complete room setup functionality for multiplayer IPL auction with enhanced features"
+git commit -m "Fixed socket connection issues and enhanced room setup functionality"
 
 echo Pushing to GitHub...
-git push origin main
+git push -u origin main
+
+echo If push failed, trying with force...
+git push --force-with-lease origin main
 
 echo Successfully pushed to GitHub!
-echo All room setup features have been deployed!
+echo Connection fixes and room setup deployed!
 pause
