@@ -66,11 +66,20 @@ io.on('connection', (socket) => {
   socket.emit('connectionConfirmed', { socketId: socket.id, timestamp: Date.now() });
 
   socket.on('createRoom', (userData) => {
-    // Generate unique 6-character room ID
-    let roomId;
-    do {
-      roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    } while (rooms.has(roomId));
+    // Generate random room ID with better algorithm
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let roomId = '';
+    for (let i = 0; i < 6; i++) {
+      roomId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    // Ensure uniqueness
+    while (rooms.has(roomId)) {
+      roomId = '';
+      for (let i = 0; i < 6; i++) {
+        roomId += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+    }
     
     const roomData = {
       id: roomId,
@@ -91,7 +100,7 @@ io.on('connection', (socket) => {
     rooms.set(roomId, roomData);
     roomPlayers.set(socket.id, roomId);
     socket.join(roomId);
-    socket.emit('roomCreated', { roomId, playerCount: 1 });
+    socket.emit('roomCreated', { roomId: roomId, playerCount: 1 });
     console.log(`Room ${roomId} created by ${socket.id}`);
   });
 

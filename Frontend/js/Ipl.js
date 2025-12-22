@@ -3522,12 +3522,12 @@ function setupSocketListeners() {
     console.log('Room created:', data);
     currentRoomId = data.roomId;
     isRoomHost = true;
-    document.getElementById('roomId').value = data.roomId;
+    document.getElementById('roomId').value = data.roomId || 'ERROR';
     document.getElementById('roomStatus').innerHTML = `
-      <div style="color:#4CAF50;font-weight:bold">Room Created: ${data.roomId}</div>
+      <div style="color:#4CAF50;font-weight:bold">Room Created: ${data.roomId || 'ERROR'}</div>
       <div style="font-size:12px;color:var(--muted)">Share this Room ID with friends • ${data.playerCount} player(s) connected</div>
     `;
-    showNotification(`Room Created: ${data.roomId}`, 'success');
+    showNotification(`Room Created: ${data.roomId || 'ERROR'}`, 'success');
     isMultiplayer = true;
     selectedTeamsInRoom = [];
     playersInRoom = [playerData];
