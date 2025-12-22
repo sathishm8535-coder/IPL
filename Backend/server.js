@@ -96,23 +96,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinRoom', (data) => {
-    console.log('JOIN ROOM EVENT RECEIVED:', data);
-    
     if (!data || !data.roomId) {
-      console.log('No room ID provided');
       socket.emit('joinError', 'Room ID required');
       return;
     }
     
     const roomId = data.roomId.toString().toUpperCase().trim();
-    console.log('Looking for room:', roomId);
-    console.log('Available rooms:', Array.from(rooms.keys()));
     
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
-      console.log('Room found! Players:', room.players.length);
       
-      // Check if player already in room
       if (!room.players.find(p => p.socketId === socket.id)) {
         room.players.push({ socketId: socket.id, ...data.userData });
       }
@@ -120,22 +113,19 @@ io.on('connection', (socket) => {
       roomPlayers.set(socket.id, roomId);
       socket.join(roomId);
       
-      // Send room data to joining player
       socket.emit('joinedRoom', { 
         roomId, 
         players: room.players,
         selectedTeams: room.selectedTeams || []
       });
       
-      // Notify other players
       socket.to(roomId).emit('playerJoined', {
         player: { socketId: socket.id, ...data.userData },
         playerCount: room.players.length
       });
       
-      console.log('Player joined successfully');
+      console.log(`Player joined room ${roomId}`);
     } else {
-      console.log('Room not found!');
       socket.emit('joinError', 'Room not found');
     }
   });

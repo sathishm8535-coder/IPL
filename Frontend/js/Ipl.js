@@ -3747,40 +3747,23 @@ if (joinBtn) {
       return;
     }
     
-    console.log('Join room clicked with ID:', id);
-    
     if (!socket || !socket.connected) {
-      console.log('Socket not connected, initializing...');
-      showNotification('Connecting to server...', 'info');
-      
+      showNotification('Connecting...', 'info');
       initializeSocket();
       
-      // Wait for connection with multiple attempts
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      const waitForConnection = () => {
-        attempts++;
-        console.log(`Waiting for connection, attempt ${attempts}`);
-        
+      setTimeout(() => {
         if (socket && socket.connected) {
-          console.log('Socket connected, joining room');
           const userData = {
             name: playerData?.name || 'Anonymous',
             email: playerData?.email || '',
             uid: playerData?.uid || Date.now()
           };
           socket.emit("joinRoom", { roomId: id, userData });
-        } else if (attempts < maxAttempts) {
-          setTimeout(waitForConnection, 1000);
         } else {
-          showNotification('Connection timeout - Please try again', 'error');
+          showNotification('Connection failed - Try again', 'error');
         }
-      };
-      
-      setTimeout(waitForConnection, 1000);
+      }, 2000);
     } else {
-      console.log('Socket already connected, joining room');
       const userData = {
         name: playerData?.name || 'Anonymous',
         email: playerData?.email || '',
