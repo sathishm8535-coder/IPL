@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Setup Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1b2a;
+            color: white;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        button {
+            background: #ff8c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>🏏 IPL Auction Room Setup Test</h1>
+    
+    <div class="test-section">
+        <h2>Server Connection</h2>
+        <div id="serverStatus" class="status">Connecting...</div>
+        <button onclick="testConnection()">Test Connection</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Room Management</h2>
+        <button onclick="createTestRoom()">Create Room</button>
+        <input type="text" id="testRoomId" placeholder="Room ID">
+        <button onclick="joinTestRoom()">Join Room</button>
+        <div id="roomStatus" class="status">No room connected</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Team Selection Test</h2>
+        <select id="teamSelect">
+            <option value="">Select Team</option>
+            <option value="Chennai Super Kings">Chennai Super Kings</option>
+            <option value="Mumbai Indians">Mumbai Indians</option>
+            <option value="Royal Challengers Bengaluru">Royal Challengers Bengaluru</option>
+        </select>
+        <button onclick="selectTestTeam()">Select Team</button>
+        <div id="teamStatus" class="status">No team selected</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = null;
+        let currentRoomId = null;
+
+        function testConnection() {
+            const serverUrl = window.location.origin;
+            socket = io(serverUrl);
+            
+            socket.on('connect', () => {
+                document.getElementById('serverStatus').innerHTML = '✅ Connected to server: ' + socket.id;
+                document.getElementById('serverStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+
+            socket.on('disconnect', () => {
+                document.getElementById('serverStatus').innerHTML = '❌ Disconnected from server';
+                document.getElementById('serverStatus').style.background = 'rgba(244, 67, 54, 0.2)';
+            });
+
+            socket.on('roomCreated', (data) => {
+                currentRoomId = data.roomId;
+                document.getElementById('testRoomId').value = data.roomId;
+                document.getElementById('roomStatus').innerHTML = `✅ Room Created: ${data.roomId}`;
+                document.getElementById('roomStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+
+            socket.on('joinedRoom', (data) => {
+                currentRoomId = data.roomId;
+                document.getElementById('roomStatus').innerHTML = `✅ Joined Room: ${data.roomId} (${data.players.length} players)`;
+                document.getElementById('roomStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+
+            socket.on('joinError', (error) => {
+                document.getElementById('roomStatus').innerHTML = `❌ Join Error: ${error}`;
+                document.getElementById('roomStatus').style.background = 'rgba(244, 67, 54, 0.2)';
+            });
+
+            socket.on('teamSelected', (data) => {
+                document.getElementById('teamStatus').innerHTML = `Team selected: ${data.teamName} by ${data.playerInfo.friendName}`;
+            });
+        }
+
+        function createTestRoom() {
+            if (!socket || !socket.connected) {
+                alert('Connect to server first!');
+                return;
+            }
+            
+            const userData = {
+                name: 'Test Player',
+                email: 'test@example.com',
+                uid: 'test123'
+            };
+            
+            socket.emit('createRoom', userData);
+        }
+
+        function joinTestRoom() {
+            if (!socket || !socket.connected) {
+                alert('Connect to server first!');
+                return;
+            }
+            
+            const roomId = document.getElementById('testRoomId').value.trim();
+            if (!roomId) {
+                alert('Enter a Room ID!');
+                return;
+            }
+            
+            const userData = {
+                name: 'Test Player 2',
+                email: 'test2@example.com',
+                uid: 'test456'
+            };
+            
+            socket.emit('joinRoom', { roomId, userData });
+        }
+
+        function selectTestTeam() {
+            if (!socket || !socket.connected || !currentRoomId) {
+                alert('Connect to server and join a room first!');
+                return;
+            }
+            
+            const teamName = document.getElementById('teamSelect').value;
+            if (!teamName) {
+                alert('Select a team first!');
+                return;
+            }
+            
+            socket.emit('selectTeam', {
+                roomId: currentRoomId,
+                teamName: teamName,
+                playerInfo: {
+                    friendName: 'Test Friend',
+                    socketId: socket.id,
+                    index: 0
+                }
+            });
+            
+            document.getElementById('teamStatus').innerHTML = `Selected: ${teamName}`;
+        }
+
+        // Auto-connect on page load
+        window.onload = () => {
+            setTimeout(testConnection, 1000);
+        };
+    </script>
+</body>
+</html>

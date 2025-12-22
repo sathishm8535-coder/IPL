@@ -3470,6 +3470,8 @@ let currentRoomId = null;
 let isMultiplayer = false;
 let playerData = null;
 let selectedTeamsInRoom = [];
+let playersInRoom = [];
+let isRoomHost = false;
 
 // Initialize socket connection
 function initializeSocket() {
@@ -3481,50 +3483,116 @@ function initializeSocket() {
   });
   
   console.log('Connecting to server:', serverUrl);
+  updateServerStatus('Connecting to server...', '#ff8c00');
 
   socket.on('connect', () => {
     console.log('Connected to server:', socket.id);
+    updateServerStatus('✅ Connected to server', '#4CAF50');
   });
 
   socket.on('disconnect', () => {
     console.log('Disconnected from server');
+    updateServerStatus('❌ Disconnected from server', '#f44336');
   });
 
   socket.on('connect_error', () => {
     console.log('Connection failed');
+    updateServerStatus('❌ Connection failed', '#f44336');
   });
 
   setupSocketListeners();
 }
 
+function updateServerStatus(message, color) {
+  const serverStatus = document.getElementById('serverStatus');
+  if (serverStatus) {
+    serverStatus.textContent = message;
+    serverStatus.style.color = color;
+  }
+}
+
 function setupSocketListeners() {
-  socket.on('roomCreated', (roomId) => {
-    console.log('Room created:', roomId);
-    currentRoomId = roomId;
-    document.getElementById('roomId').value = roomId;
-    document.getElementById('roomStatus').textContent = `Room ${roomId} created - Share this ID`;
-    document.getElementById('roomStatus').style.color = '#4CAF50';
-    showNotification(`Room Created: ${roomId}`, 'success');
+  socket.on('roomCreated', (data) => {
+    console.log('Room created:', data);
+    currentRoomId = data.roomId;
+    isRoomHost = true;
+    document.getElementById('roomId').value = data.roomId;
+    document.getElementById('roomStatus').innerHTML = `
+      <div style="color:#4CAF50;font-weight:bold">Room Created: ${data.roomId}</div>
+      <div style="font-size:12px;color:var(--muted)">Share this Room ID with friends • ${data.playerCount} player(s) connected</div>
+    `;
+    showNotification(`Room Created: ${data.roomId}`, 'success');
     isMultiplayer = true;
     selectedTeamsInRoom = [];
+    playersInRoom = [playerData];
   });
 
   socket.on('joinedRoom', (data) => {
     console.log('Successfully joined room:', data);
     currentRoomId = data.roomId;
-    document.getElementById('roomStatus').textContent = `Connected to Room ${data.roomId} - ${data.players.length} player(s)`;
-    document.getElementById('roomStatus').style.color = '#4CAF50';
+    isRoomHost = false;
+    selectedTeamsInRoom = data.selectedTeams || [];
+    playersInRoom = data.players || [];
+    document.getElementById('roomStatus').innerHTML = `
+      <div style="color:#4CAF50;font-weight:bold">Connected to Room: ${data.roomId}</div>
+      <div style="font-size:12px;color:var(--muted)">${data.players.length} player(s) connected</div>
+    `;
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
+    updateTeamDropdowns(); // Update dropdowns with already selected teams
+  });
+
+  socket.on('playerJoined', (data) => {
+    console.log('Player joined room:', data);
+    playersInRoom = playersInRoom.filter(p => p.socketId !== data.player.socketId);
+    playersInRoom.push(data.player);
+    
+    if (currentRoomId) {
+      document.getElementById('roomStatus').innerHTML = `
+        <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
+        <div style="font-size:12px;color:var(--muted)">${data.playerCount} player(s) connected</div>
+      `;
+    }
+    showNotification(`${data.player.name || 'Player'} joined the room`, 'info');
+  });
+
+  socket.on('playerLeft', (data) => {
+    console.log('Player left room:', data);
+    playersInRoom = playersInRoom.filter(p => p.socketId !== data.playerId);
+    selectedTeamsInRoom = data.selectedTeams || [];
+    
+    if (currentRoomId) {
+      document.getElementById('roomStatus').innerHTML = `
+        <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
+        <div style="font-size:12px;color:var(--muted)">${data.playerCount} player(s) connected</div>
+      `;
+    }
+    updateTeamDropdowns();
+    showNotification('A player left the room', 'info');
+  });
+
+  socket.on('teamSelected', (data) => {
+    console.log('Team selected by another player:', data);
+    selectedTeamsInRoom = data.selectedTeams || [];
+    
+    if (data.socketId !== socket.id) {
+      const playerName = data.playerInfo?.friendName || 'Another player';
+      showNotification(`${playerName} selected ${data.teamName}`, 'info');
+    }
+    
+    updateTeamDropdowns();
   });
 
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
-    document.getElementById('roomStatus').textContent = `Failed to join room: ${error}`;
-    document.getElementById('roomStatus').style.color = '#f44336';
+    document.getElementById('roomStatus').innerHTML = `
+      <div style="color:#f44336;font-weight:bold">Failed to join room</div>
+      <div style="font-size:12px;color:var(--muted)">${error}</div>
+    `;
     showNotification(`Join Error: ${error}`, 'error');
     isMultiplayer = false;
     currentRoomId = null;
+    isRoomHost = false;
   });
 
   socket.on('auctionStarted', (data) => {

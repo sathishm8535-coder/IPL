@@ -45,10 +45,12 @@ app.get('/api/rooms', (req, res) => {
 });
 
 const rooms = new Map();
+const roomPlayers = new Map(); // Track players in each room
 
 // Log all active rooms for debugging
 setInterval(() => {
   console.log('Active rooms:', Array.from(rooms.keys()));
+  console.log('Room players:', Array.from(roomPlayers.entries()));
 }, 30000);
 
 io.on('connection', (socket) => {
@@ -74,11 +76,13 @@ io.on('connection', (socket) => {
       teams: [],
       currentBid: null,
       createdAt: new Date().toISOString(),
-      host: socket.id
+      host: socket.id,
+      selectedTeams: [] // Track selected teams in room
     };
     rooms.set(roomId, roomData);
+    roomPlayers.set(socket.id, roomId);
     socket.join(roomId);
-    socket.emit('roomCreated', roomId);
+    socket.emit('roomCreated', { roomId, playerCount: 1 });
     console.log(`Room ${roomId} created by ${socket.id}. Total rooms: ${rooms.size}`);
   });
 
@@ -99,17 +103,60 @@ io.on('connection', (socket) => {
       const room = rooms.get(roomId);
       console.log('Room found! Players:', room.players.length);
       
+      // Check if player already in room
       if (!room.players.find(p => p.socketId === socket.id)) {
         room.players.push({ socketId: socket.id, ...data.userData });
       }
       
+      roomPlayers.set(socket.id, roomId);
       socket.join(roomId);
-      socket.emit('joinedRoom', { roomId, players: room.players });
+      
+      // Send room data to joining player
+      socket.emit('joinedRoom', { 
+        roomId, 
+        players: room.players,
+        selectedTeams: room.selectedTeams || []
+      });
+      
+      // Notify other players
+      socket.to(roomId).emit('playerJoined', {
+        player: { socketId: socket.id, ...data.userData },
+        playerCount: room.players.length
+      });
       
       console.log('Player joined successfully');
     } else {
       console.log('Room not found!');
       socket.emit('joinError', 'Room not found');
+    }
+  });
+
+  // Handle team selection in multiplayer
+  socket.on('selectTeam', (data) => {
+    const { roomId, teamName, playerInfo } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      if (!room.selectedTeams) room.selectedTeams = [];
+      
+      // Remove any previous team selection by this player
+      room.selectedTeams = room.selectedTeams.filter(t => t.socketId !== socket.id);
+      
+      // Add new team selection
+      room.selectedTeams.push({
+        socketId: socket.id,
+        teamName,
+        playerInfo
+      });
+      
+      // Broadcast team selection to all players in room
+      io.to(roomId).emit('teamSelected', {
+        socketId: socket.id,
+        teamName,
+        playerInfo,
+        selectedTeams: room.selectedTeams.map(t => t.teamName)
+      });
+      
+      console.log(`Team ${teamName} selected by ${socket.id} in room ${roomId}`);
     }
   });
 
@@ -193,22 +240,38 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
-    // Remove player from all rooms
-    for (const [roomId, room] of rooms.entries()) {
+    
+    const roomId = roomPlayers.get(socket.id);
+    if (roomId && rooms.has(roomId)) {
+      const room = rooms.get(roomId);
+      
+      // Remove player from room
       const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
       if (playerIndex !== -1) {
         room.players.splice(playerIndex, 1);
+        
+        // Remove team selections by this player
+        if (room.selectedTeams) {
+          room.selectedTeams = room.selectedTeams.filter(t => t.socketId !== socket.id);
+        }
+        
+        // Notify other players
         socket.to(roomId).emit('playerLeft', { 
           playerId: socket.id, 
-          playerCount: room.players.length 
+          playerCount: room.players.length,
+          selectedTeams: room.selectedTeams ? room.selectedTeams.map(t => t.teamName) : []
         });
+        
+        // Delete room if empty
         if (room.players.length === 0) {
           rooms.delete(roomId);
           console.log(`Room ${roomId} deleted - no players left`);
         }
-        break;
       }
     }
+    
+    // Clean up player tracking
+    roomPlayers.delete(socket.id);
   });
 });
 
