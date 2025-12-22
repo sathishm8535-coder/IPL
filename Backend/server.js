@@ -277,10 +277,15 @@ io.on('connection', (socket) => {
           selectedTeams: room.selectedTeams ? room.selectedTeams.map(t => t.teamName) : []
         });
         
-        // Delete room if empty
+        // Keep room alive for 5 minutes even if empty
         if (room.players.length === 0) {
-          rooms.delete(roomId);
-          console.log(`Room ${roomId} deleted - no players left`);
+          console.log(`Room ${roomId} is empty, will delete in 5 minutes`);
+          setTimeout(() => {
+            if (rooms.has(roomId) && rooms.get(roomId).players.length === 0) {
+              rooms.delete(roomId);
+              console.log(`Room ${roomId} deleted after timeout`);
+            }
+          }, 300000); // 5 minutes
         }
       }
     }
