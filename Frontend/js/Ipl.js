@@ -3469,86 +3469,32 @@ let socket = null;
 let currentRoomId = null;
 let isMultiplayer = false;
 let playerData = null;
-let selectedTeamsInRoom = []; // Track teams selected by all players in room
+let selectedTeamsInRoom = [];
 
 // Initialize socket connection
 function initializeSocket() {
-  // For local multiplayer, connect to the same server that served this page
   const serverUrl = window.location.origin;
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
-    timeout: 20000,
-    forceNew: true
+    timeout: 10000
   });
   
   console.log('Connecting to server:', serverUrl);
 
   socket.on('connect', () => {
     console.log('Connected to server:', socket.id);
-    updateConnectionStatus(true);
   });
 
   socket.on('disconnect', () => {
     console.log('Disconnected from server');
-    updateConnectionStatus(false);
   });
 
-  socket.on('connect_error', (error) => {
-    console.error('Connection error:', error);
-    updateConnectionStatus(false);
-    showNotification('Connection failed. Server may be starting up. Please wait and try again.', 'error');
-    
-    // Try to reconnect after 5 seconds
-    setTimeout(() => {
-      if (!socket.connected) {
-        console.log('Attempting to reconnect...');
-        socket.connect();
-      }
-    }, 5000);
-  });
-
-  socket.on('reconnect', () => {
-    console.log('Reconnected to server');
-    updateConnectionStatus(true);
-    showNotification('Reconnected to server!', 'success');
-  });
-
-  socket.on('reconnect_error', () => {
-    showNotification('Reconnection failed. Please refresh page.', 'error');
+  socket.on('connect_error', () => {
+    console.log('Connection failed');
   });
 
   setupSocketListeners();
-}
-
-function updateConnectionStatus(connected) {
-  const statusEl = document.getElementById('connectionStatus');
-  if (!statusEl) {
-    const status = document.createElement('div');
-    status.id = 'connectionStatus';
-    status.style.cssText = 'position:fixed;top:10px;right:10px;padding:5px 10px;border-radius:5px;font-size:12px;z-index:1000';
-    document.body.appendChild(status);
-  }
-  const statusElement = document.getElementById('connectionStatus');
-  const serverStatusEl = document.getElementById('serverStatus');
-  
-  if (connected) {
-    statusElement.textContent = '🟢 Connected';
-    statusElement.style.backgroundColor = '#4CAF50';
-    statusElement.style.color = 'white';
-    if (serverStatusEl) {
-      serverStatusEl.innerHTML = `✅ Connected to: ${window.location.origin}`;
-      serverStatusEl.style.color = '#4CAF50';
-    }
-  } else {
-    statusElement.textContent = '🔴 Disconnected';
-    statusElement.style.backgroundColor = '#f44336';
-    statusElement.style.color = 'white';
-    if (serverStatusEl) {
-      serverStatusEl.innerHTML = `❌ Disconnected from: ${window.location.origin} - Retrying...`;
-      serverStatusEl.style.color = '#f44336';
-    }
-  }
 }
 
 function setupSocketListeners() {
@@ -3556,91 +3502,36 @@ function setupSocketListeners() {
     console.log('Room created:', roomId);
     currentRoomId = roomId;
     document.getElementById('roomId').value = roomId;
-    const statusText = `Room ${roomId} created - Share this ID with other players`;
-    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').textContent = `Room ${roomId} created - Share this ID`;
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
-    selectedTeamsInRoom = []; // Reset selected teams
+    selectedTeamsInRoom = [];
   });
 
   socket.on('joinedRoom', (data) => {
     console.log('Successfully joined room:', data);
     currentRoomId = data.roomId;
-    const statusText = `Connected to Room ${data.roomId} - ${data.players.length} player(s)`;
-    document.getElementById('roomStatus').textContent = statusText;
+    document.getElementById('roomStatus').textContent = `Connected to Room ${data.roomId} - ${data.players.length} player(s)`;
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
-    
-    // Sync selected teams from game state
-    if (data.gameState && data.gameState.selectedTeams) {
-      selectedTeamsInRoom = data.gameState.selectedTeams;
-      updateTeamDropdowns();
-    }
   });
 
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
-    const statusEl = document.getElementById('roomStatus');
-    if (statusEl) {
-      statusEl.textContent = `Failed to join room: ${error}`;
-      statusEl.style.color = '#f44336';
-    }
+    document.getElementById('roomStatus').textContent = `Failed to join room: ${error}`;
+    document.getElementById('roomStatus').style.color = '#f44336';
     showNotification(`Join Error: ${error}`, 'error');
     isMultiplayer = false;
     currentRoomId = null;
   });
 
-  socket.on('playerJoined', (data) => {
-    if (currentRoomId) {
-      document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} player(s) connected`;
-      document.getElementById('roomStatus').style.color = '#4CAF50';
-      if (data.playerId !== socket.id) {
-        showNotification(`Player joined: ${data.newPlayer?.name || 'Unknown'}`, 'info');
-      }
-    }
-  });
-
-  socket.on('playerLeft', (data) => {
-    showNotification(`Player left the room`, 'info');
-    if (currentRoomId) {
-      document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} player(s) connected`;
-    }
-  });
-
-  // Team selection synchronization
-  socket.on('teamSelected', (data) => {
-    console.log('Team selected by player:', data);
-    selectedTeamsInRoom = data.selectedTeams;
-    updateTeamDropdowns();
-    
-    if (data.playerId !== socket.id) {
-      showNotification(`${data.playerInfo.friendName} selected ${data.teamName}`, 'info');
-    }
-  });
-
-  socket.on('teamSelectError', (error) => {
-    console.error('Team selection error:', error);
-    showNotification(`Team Selection Error: ${error}`, 'error');
-    
-    // Reset the dropdown that caused the error
-    const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
-    selects.forEach(select => {
-      if (selectedTeamsInRoom.includes(select.value)) {
-        select.value = '';
-      }
-    });
-    updateTeamDropdowns();
-  });
-
   socket.on('auctionStarted', (data) => {
     console.log('Auction started:', data);
-    // Sync teams and game state for ALL players
     if (data.teams) {
       teams = data.teams;
       currentPlayerIndex = data.gameState.currentPlayerIndex || 0;
-      // Hide selection and show auction for all players
       document.getElementById("team-selection").style.display = "none";
       auctionBlock.style.display = "grid";
       populateBidButtons();
@@ -3729,25 +3620,28 @@ const roomInput = document.getElementById("roomId");
 // Create Room button click
 if (createBtn) {
   createBtn.addEventListener("click", () => {
-    if (!socket) {
-      showNotification('Socket not initialized. Please refresh the page.', 'error');
-      return;
+    if (!socket || !socket.connected) {
+      initializeSocket();
+      setTimeout(() => {
+        if (socket && socket.connected) {
+          const userData = {
+            name: playerData?.name || 'Anonymous',
+            email: playerData?.email || '',
+            uid: playerData?.uid || Date.now()
+          };
+          socket.emit("createRoom", userData);
+        } else {
+          showNotification('Failed to connect to server', 'error');
+        }
+      }, 2000);
+    } else {
+      const userData = {
+        name: playerData?.name || 'Anonymous',
+        email: playerData?.email || '',
+        uid: playerData?.uid || socket.id
+      };
+      socket.emit("createRoom", userData);
     }
-    
-    if (!socket.connected) {
-      showNotification('Not connected to server. Trying to reconnect...', 'error');
-      socket.connect();
-      return;
-    }
-    
-    const userData = {
-      name: playerData?.name || 'Anonymous',
-      email: playerData?.email || '',
-      uid: playerData?.uid || socket.id
-    };
-    
-    console.log('Creating room with userData:', userData);
-    socket.emit("createRoom", userData);
   });
 }
 
@@ -3757,50 +3651,31 @@ if (joinBtn) {
     const id = roomInput.value.trim().toUpperCase();
     if (!id) {
       showNotification('Enter a Room ID to join!', 'error');
-      roomInput.focus();
       return;
     }
     
-    // Validate room ID format (6 characters, alphanumeric)
-    if (id.length !== 6 || !/^[A-Z0-9]+$/.test(id)) {
-      showNotification('Room ID must be 6 characters (letters and numbers only)', 'error');
-      roomInput.focus();
-      return;
-    }
-    
-    if (!socket) {
-      showNotification('Socket not initialized. Please refresh the page.', 'error');
-      return;
-    }
-    
-    if (!socket.connected) {
-      showNotification('Not connected to server. Trying to reconnect...', 'error');
-      socket.connect();
+    if (!socket || !socket.connected) {
+      initializeSocket();
       setTimeout(() => {
-        if (!socket.connected) {
-          showNotification('Failed to reconnect. Please refresh page.', 'error');
+        if (socket && socket.connected) {
+          const userData = {
+            name: playerData?.name || 'Anonymous',
+            email: playerData?.email || '',
+            uid: playerData?.uid || Date.now()
+          };
+          socket.emit("joinRoom", { roomId: id, userData });
+        } else {
+          showNotification('Failed to connect to server', 'error');
         }
-      }, 3000);
-      return;
+      }, 2000);
+    } else {
+      const userData = {
+        name: playerData?.name || 'Anonymous',
+        email: playerData?.email || '',
+        uid: playerData?.uid || socket.id
+      };
+      socket.emit("joinRoom", { roomId: id, userData });
     }
-    
-    const userData = {
-      name: playerData?.name || 'Anonymous',
-      email: playerData?.email || '',
-      uid: playerData?.uid || socket.id
-    };
-    
-    console.log('Attempting to join room:', id, 'with userData:', userData);
-    document.getElementById('roomStatus').textContent = `Joining room ${id}...`;
-    document.getElementById('roomStatus').style.color = '#2196F3';
-    
-    // Disable join button temporarily to prevent multiple clicks
-    joinBtn.disabled = true;
-    setTimeout(() => {
-      joinBtn.disabled = false;
-    }, 3000);
-    
-    socket.emit("joinRoom", { roomId: id, userData });
   });
 }
 
