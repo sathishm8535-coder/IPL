@@ -101,6 +101,10 @@
             Sign in with Google
         </button>
         
+        <button class="login-btn test-btn" onclick="testLogin()">
+            🧪 Test Login (Local Development)
+        </button>
+        
 
     </div>
 
@@ -135,6 +139,17 @@
                 .catch((error) => {
                     alert('Login failed: ' + error.message);
                 });
+        }
+        
+        window.testLogin = function() {
+            // For local testing - bypass Google login
+            localStorage.setItem('userInfo', JSON.stringify({
+                name: 'Test User',
+                email: 'test@example.com',
+                photo: '',
+                uid: 'test-user-123'
+            }));
+            window.location.href = 'index.html';
         }
     </script>
 </body>

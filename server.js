@@ -35,7 +35,14 @@ io.on('connection', (socket) => {
     rooms.set(roomId, {
       id: roomId,
       players: [{ socketId: socket.id, userData: userData || { name: 'Anonymous' } }],
-      gameState: { currentPlayerIndex: 0, currentPrice: 0 }
+      gameState: { 
+        currentPlayerIndex: 0, 
+        currentPrice: 0,
+        phase: 'team_selection', // team_selection, auction, completed
+        selectedTeams: [], // Track selected IPL teams
+        teams: [], // Final team configurations
+        highestBidderIdx: -1
+      }
     });
     socket.join(roomId);
     socket.emit('roomCreated', roomId);
@@ -97,21 +104,101 @@ io.on('connection', (socket) => {
     console.log('Player joined room successfully:', upperRoomId, 'Total players:', room.players.length);
   });
 
+  // Team selection synchronization
+  socket.on('selectTeam', (data) => {
+    const { roomId, teamName, playerInfo } = data;
+    const room = rooms.get(roomId);
+    
+    if (!room) {
+      socket.emit('teamSelectError', 'Room not found');
+      return;
+    }
+
+    // Check if team already selected
+    if (room.gameState.selectedTeams.includes(teamName)) {
+      socket.emit('teamSelectError', 'Team already selected by another player');
+      return;
+    }
+
+    // Add team to selected teams
+    room.gameState.selectedTeams.push(teamName);
+    
+    // Broadcast team selection to all players in room
+    io.to(roomId).emit('teamSelected', {
+      teamName,
+      playerId: socket.id,
+      playerInfo,
+      selectedTeams: room.gameState.selectedTeams
+    });
+
+    console.log('Team selected:', teamName, 'in room:', roomId);
+  });
+
   socket.on('startAuction', (data) => {
     const { roomId, teams } = data;
     const room = rooms.get(roomId);
     if (room) {
       room.gameState.teams = teams;
-      io.to(roomId).emit('auctionStarted', { teams, gameState: room.gameState });
+      room.gameState.phase = 'auction';
+      room.gameState.currentPlayerIndex = 0;
+      room.gameState.currentPrice = 0;
+      room.gameState.highestBidderIdx = -1;
+      
+      io.to(roomId).emit('auctionStarted', { 
+        teams, 
+        gameState: room.gameState 
+      });
+      console.log('Auction started in room:', roomId);
     }
   });
 
   socket.on('placeBid', (data) => {
     const { roomId, bidAmount, teamIndex, playerName, socketId } = data;
     const room = rooms.get(roomId);
-    if (room) {
+    if (room && room.gameState.phase === 'auction') {
       room.gameState.currentPrice = bidAmount;
-      io.to(roomId).emit('bidPlaced', { bidAmount, teamIndex, playerName, socketId });
+      room.gameState.highestBidderIdx = teamIndex;
+      
+      io.to(roomId).emit('bidPlaced', { 
+        bidAmount, 
+        teamIndex, 
+        playerName, 
+        socketId 
+      });
+      console.log('Bid placed in room:', roomId, 'Amount:', bidAmount);
+    }
+  });
+
+  socket.on('playerAssigned', (data) => {
+    const { roomId, player, winningTeam, price, skipped } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      // Update room's game state
+      if (winningTeam && !skipped) {
+        const teamIndex = room.gameState.teams.findIndex(t => t.teamName === winningTeam.teamName);
+        if (teamIndex !== -1) {
+          room.gameState.teams[teamIndex] = winningTeam;
+        }
+      }
+      
+      io.to(roomId).emit('playerAssigned', data);
+      console.log('Player assigned in room:', roomId, 'Player:', player.name);
+    }
+  });
+
+  socket.on('nextPlayer', (data) => {
+    const { roomId, playerIndex } = data;
+    const room = rooms.get(roomId);
+    if (room) {
+      room.gameState.currentPlayerIndex = playerIndex;
+      room.gameState.currentPrice = 0;
+      room.gameState.highestBidderIdx = -1;
+      
+      io.to(roomId).emit('nextPlayer', {
+        playerIndex,
+        gameState: room.gameState
+      });
+      console.log('Next player in room:', roomId, 'Index:', playerIndex);
     }
   });
 
@@ -122,13 +209,18 @@ io.on('connection', (socket) => {
     for (const [roomId, room] of rooms.entries()) {
       const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
       if (playerIndex !== -1) {
+        const disconnectedPlayer = room.players[playerIndex];
         room.players.splice(playerIndex, 1);
         console.log('Removed player from room:', roomId, 'Remaining players:', room.players.length);
+        
+        // Remove any team selections by this player
+        // Note: In a real implementation, you might want to handle this differently
         
         // Notify other players
         socket.to(roomId).emit('playerLeft', {
           playerId: socket.id,
-          playerCount: room.players.length
+          playerCount: room.players.length,
+          playerData: disconnectedPlayer.userData
         });
         
         // Delete room if empty
@@ -144,4 +236,9 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🏏 IPL Auction Server running on port ${PORT}`);
+  console.log(`🌐 Open your browser: http://localhost:${PORT}`);
+  
+  // Auto-open browser on Windows
+  const { exec } = require('child_process');
+  exec(`start http://localhost:${PORT}`);
 });

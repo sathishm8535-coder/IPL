@@ -2785,16 +2785,31 @@ function buildTeamRows(count) {
 
     // team change -> enforce uniqueness & show team logo only if no uploaded photo
     sel.addEventListener("change", () => {
+      const selectedTeam = sel.value;
+      
+      // In multiplayer mode, emit team selection to server
+      if (isMultiplayer && socket && socket.connected && currentRoomId && selectedTeam) {
+        const friendName = document.getElementById(`friend-name-${i}`)?.value.trim() || `Friend ${i + 1}`;
+        socket.emit('selectTeam', {
+          roomId: currentRoomId,
+          teamName: selectedTeam,
+          playerInfo: {
+            friendName,
+            socketId: socket.id,
+            index: i
+          }
+        });
+      }
+      
       updateTeamDropdowns();
 
       const preview = document.getElementById(`avatar-preview-${i}`);
-      const selected = sel.value;
       // if preview image is uploaded by user, keep it (uploaded overrides)
       if (preview.dataset.uploaded === "true") {
         // user picture exists — do nothing
       } else {
-        if (selected && TEAM_LOGOS[selected]) {
-          preview.src = TEAM_LOGOS[selected];
+        if (selectedTeam && TEAM_LOGOS[selectedTeam]) {
+          preview.src = TEAM_LOGOS[selectedTeam];
           preview.style.display = "inline-block";
           preview.dataset.uploaded = "false";
         } else {
@@ -2864,7 +2879,13 @@ setTimeout(updateTeamDropdowns, 40);
 /* ====== Team dropdown uniqueness helper ====== */
 function updateTeamDropdowns() {
   const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
-  const selected = selects.map((s) => s.value).filter((v) => v);
+  const localSelected = selects.map((s) => s.value).filter((v) => v);
+  
+  // In multiplayer mode, also consider teams selected by other players
+  const allSelected = isMultiplayer ? 
+    [...new Set([...localSelected, ...selectedTeamsInRoom])] : 
+    localSelected;
+  
   selects.forEach((s) => {
     const own = s.value;
     // recreate options
@@ -2875,10 +2896,17 @@ function updateTeamDropdowns() {
     s.appendChild(defaultOpt);
 
     IPL_TEAMS.forEach((team) => {
-      if (!selected.includes(team) || team === own) {
+      if (!allSelected.includes(team) || team === own) {
         const o = document.createElement("option");
         o.value = team;
         o.text = team;
+        
+        // Mark teams selected by other players as disabled
+        if (isMultiplayer && selectedTeamsInRoom.includes(team) && team !== own) {
+          o.disabled = true;
+          o.text += " (Selected by another player)";
+        }
+        
         s.appendChild(o);
       }
     });
@@ -3441,6 +3469,7 @@ let socket = null;
 let currentRoomId = null;
 let isMultiplayer = false;
 let playerData = null;
+let selectedTeamsInRoom = []; // Track teams selected by all players in room
 
 // Initialize socket connection
 function initializeSocket() {
@@ -3532,6 +3561,7 @@ function setupSocketListeners() {
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
+    selectedTeamsInRoom = []; // Reset selected teams
   });
 
   socket.on('joinedRoom', (data) => {
@@ -3542,6 +3572,12 @@ function setupSocketListeners() {
     document.getElementById('roomStatus').style.color = '#4CAF50';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
     isMultiplayer = true;
+    
+    // Sync selected teams from game state
+    if (data.gameState && data.gameState.selectedTeams) {
+      selectedTeamsInRoom = data.gameState.selectedTeams;
+      updateTeamDropdowns();
+    }
   });
 
   socket.on('joinError', (error) => {
@@ -3552,7 +3588,6 @@ function setupSocketListeners() {
       statusEl.style.color = '#f44336';
     }
     showNotification(`Join Error: ${error}`, 'error');
-    // Don't clear room input on error so user can try again
     isMultiplayer = false;
     currentRoomId = null;
   });
@@ -3569,6 +3604,34 @@ function setupSocketListeners() {
 
   socket.on('playerLeft', (data) => {
     showNotification(`Player left the room`, 'info');
+    if (currentRoomId) {
+      document.getElementById('roomStatus').textContent = `Room ${currentRoomId} - ${data.playerCount} player(s) connected`;
+    }
+  });
+
+  // Team selection synchronization
+  socket.on('teamSelected', (data) => {
+    console.log('Team selected by player:', data);
+    selectedTeamsInRoom = data.selectedTeams;
+    updateTeamDropdowns();
+    
+    if (data.playerId !== socket.id) {
+      showNotification(`${data.playerInfo.friendName} selected ${data.teamName}`, 'info');
+    }
+  });
+
+  socket.on('teamSelectError', (error) => {
+    console.error('Team selection error:', error);
+    showNotification(`Team Selection Error: ${error}`, 'error');
+    
+    // Reset the dropdown that caused the error
+    const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
+    selects.forEach(select => {
+      if (selectedTeamsInRoom.includes(select.value)) {
+        select.value = '';
+      }
+    });
+    updateTeamDropdowns();
   });
 
   socket.on('auctionStarted', (data) => {
@@ -3589,31 +3652,30 @@ function setupSocketListeners() {
 
   socket.on('bidPlaced', (data) => {
     console.log('Bid received:', data);
-    // Only update if this bid is from another player
+    currentPrice = data.bidAmount;
+    highestBidderIdx = data.teamIndex;
+    currentPriceEl.textContent = currentPrice;
+    highestBidderEl.textContent = data.playerName;
+    
+    countdown = NO_BID_SECONDS;
+    timerEl.textContent = `${countdown}s`;
+    startCountdownIfNeeded();
+    
     if (data.socketId !== socket.id) {
-      currentPrice = data.bidAmount;
-      highestBidderIdx = data.teamIndex;
-      currentPriceEl.textContent = currentPrice;
-      highestBidderEl.textContent = data.playerName;
-      
-      // Reset timer
-      countdown = NO_BID_SECONDS;
-      timerEl.textContent = `${countdown}s`;
-      startCountdownIfNeeded();
-      
       showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
     }
   });
 
-  socket.on('playerChanged', (data) => {
-    console.log('Player changed:', data);
-    // Move to next player
-    currentPlayerIndex = data.gameState.currentPlayerIndex;
+  socket.on('nextPlayer', (data) => {
+    console.log('Next player:', data);
+    currentPlayerIndex = data.playerIndex;
     highestBidderIdx = -1;
+    
     if (timerInterval) {
       clearInterval(timerInterval);
       timerInterval = null;
     }
+    
     if (currentPlayerIndex < players.length) {
       loadPlayer();
       showNotification('Next player loaded', 'info');
@@ -3623,25 +3685,11 @@ function setupSocketListeners() {
     }
   });
 
-  socket.on('gameStateUpdated', (gameState) => {
-    console.log('Game state updated:', gameState);
-    // Sync game state
-    if (gameState.currentPlayerIndex !== undefined) {
-      currentPlayerIndex = gameState.currentPlayerIndex;
-    }
-    if (gameState.currentPrice !== undefined) {
-      currentPrice = gameState.currentPrice;
-      currentPriceEl.textContent = currentPrice;
-    }
-  });
-
   socket.on('playerAssigned', (data) => {
     console.log('Player assigned:', data);
     if (data.winningTeam && !data.skipped) {
-      // Find the team in local teams array and update it
       const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
       if (teamIndex !== -1) {
-        // Only add if player not already in team
         const playerExists = teams[teamIndex].players.some(p => 
           (typeof p === 'string' ? p : p.name) === data.player.name
         );
@@ -3655,6 +3703,12 @@ function setupSocketListeners() {
         updateLiveScoreboard();
       }
     }
+    
+    auctionHistory.insertAdjacentHTML(
+      "afterbegin",
+      data.skipped ? `<li>❌ ${data.player.name} - UNSOLD</li>` :
+      `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} sold for ₹${data.price} Cr</li>`
+    );
   });
 }
 
