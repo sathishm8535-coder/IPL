@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
   socket.emit('connectionConfirmed', { socketId: socket.id, timestamp: Date.now() });
 
   socket.on('createRoom', (userData) => {
-    // Generate unique room ID
+    // Generate unique 6-character room ID
     let roomId;
     do {
       roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -86,13 +86,13 @@ io.on('connection', (socket) => {
       currentBid: null,
       createdAt: new Date().toISOString(),
       host: socket.id,
-      selectedTeams: [] // Track selected teams in room
+      selectedTeams: []
     };
     rooms.set(roomId, roomData);
     roomPlayers.set(socket.id, roomId);
     socket.join(roomId);
     socket.emit('roomCreated', { roomId, playerCount: 1 });
-    console.log(`Room ${roomId} created by ${socket.id}. Total rooms: ${rooms.size}`);
+    console.log(`Room ${roomId} created by ${socket.id}`);
   });
 
   socket.on('joinRoom', (data) => {
