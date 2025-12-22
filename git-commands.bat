@@ -3,10 +3,11 @@ echo Adding all changes to git...
 git add .
 
 echo Committing changes...
-git commit -m "Enhanced room setup functionality for multiplayer IPL auction"
+git commit -m "Complete room setup functionality for multiplayer IPL auction with enhanced features"
 
-echo Pushing to remote repository...
-git push
+echo Pushing to GitHub...
+git push origin main
 
-echo Done!
+echo Successfully pushed to GitHub!
+echo All room setup features have been deployed!
 pause
