@@ -97,13 +97,26 @@
             socket.on('connect', () => {
                 document.getElementById('serverStatus').innerHTML = '✅ Connected: ' + socket.id;
                 document.getElementById('serverStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+                console.log('Socket connected:', socket.id);
+            });
+
+            socket.on('disconnect', () => {
+                document.getElementById('serverStatus').innerHTML = '❌ Disconnected';
+                document.getElementById('serverStatus').style.background = 'rgba(244, 67, 54, 0.2)';
             });
 
             socket.on('roomCreated', (data) => {
+                console.log('Room created:', data);
                 currentRoomId = data.roomId;
                 document.getElementById('testRoomId').value = data.roomId;
                 document.getElementById('roomStatus').innerHTML = `✅ Room Created: ${data.roomId}`;
                 document.getElementById('roomStatus').style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+
+            socket.on('roomError', (error) => {
+                console.error('Room error:', error);
+                document.getElementById('roomStatus').innerHTML = `❌ Room Error: ${error.message}`;
+                document.getElementById('roomStatus').style.background = 'rgba(244, 67, 54, 0.2)';
             });
 
             socket.on('joinedRoom', (data) => {
@@ -132,8 +145,22 @@
         }
 
         function createTestRoom() {
-            if (!socket?.connected) return alert('Connect first!');
-            socket.emit('createRoom', { name: 'Test Player', email: 'test@test.com', uid: 'test123' });
+            if (!socket?.connected) {
+                alert('Connect to server first!');
+                return;
+            }
+            
+            console.log('Creating test room...');
+            document.getElementById('roomStatus').innerHTML = 'Creating room...';
+            
+            const userData = { 
+                name: 'Test Player', 
+                email: 'test@test.com', 
+                uid: 'test123' 
+            };
+            
+            console.log('Sending createRoom with data:', userData);
+            socket.emit('createRoom', userData);
         }
 
         function joinTestRoom() {

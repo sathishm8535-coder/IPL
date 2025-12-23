@@ -66,6 +66,8 @@ io.on('connection', (socket) => {
   socket.emit('connectionConfirmed', { socketId: socket.id, timestamp: Date.now() });
 
   socket.on('createRoom', (userData) => {
+    console.log('Creating room for user:', userData);
+    
     // Generate random room ID with better algorithm
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let roomId = '';
@@ -97,11 +99,24 @@ io.on('connection', (socket) => {
       host: socket.id,
       selectedTeams: []
     };
-    rooms.set(roomId, roomData);
-    roomPlayers.set(socket.id, roomId);
-    socket.join(roomId);
-    socket.emit('roomCreated', { roomId: roomId, playerCount: 1 });
-    console.log(`Room ${roomId} created by ${socket.id}`);
+    
+    try {
+      rooms.set(roomId, roomData);
+      roomPlayers.set(socket.id, roomId);
+      socket.join(roomId);
+      
+      socket.emit('roomCreated', { 
+        roomId: roomId, 
+        playerCount: 1,
+        success: true
+      });
+      
+      console.log(`✅ Room ${roomId} created successfully by ${socket.id}`);
+      console.log(`Total active rooms: ${rooms.size}`);
+    } catch (error) {
+      console.error('❌ Error creating room:', error);
+      socket.emit('roomError', { message: 'Failed to create room', error: error.message });
+    }
   });
 
   socket.on('joinRoom', (data) => {
@@ -278,6 +293,61 @@ io.on('connection', (socket) => {
         });
         
         // Keep room alive for 5 minutes even if empty
+        if (room.players.length === 0) {
+          console.log(`Room ${roomId} is empty, will delete in 5 minutes`);
+          setTimeout(() => {
+            if (rooms.has(roomId) && rooms.get(roomId).players.length === 0) {
+              rooms.delete(roomId);
+              console.log(`Room ${roomId} deleted after timeout`);
+            }
+          }, 300000); // 5 minutes
+        }
+      }
+    }
+    
+    // Clean up player tracking
+    roomPlayers.delete(socket.id);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
+
+function getLocalIP() {
+  const { networkInterfaces } = require('os');
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
+      }
+    }
+  }
+  return 'localhost';
+}
+
+server.listen(PORT, HOST, () => {
+  const localIP = getLocalIP();
+  console.log('\n🏏 IPL AUCTION SERVER STARTED!');
+  console.log('=' .repeat(50));
+  console.log(`🌐 Server running on port ${PORT}`);
+  console.log(`\n📱 MULTIPLAYER SETUP:`);
+  console.log(`   Host computer: http://${localIP}:${PORT}`);
+  console.log(`   Other devices: http://${localIP}:${PORT}`);
+  console.log(`\n⚠️  IMPORTANT: All devices must use the SAME URL above!`);
+  console.log(`   Your IP address is: ${localIP}`);
+  console.log('=' .repeat(50));
+  console.log(`🔐 Login Page: http://localhost:${PORT}`);
+  console.log(`🎮 Game URL: http://localhost:${PORT}/game`);
+  console.log(`🧪 Test URL: http://localhost:${PORT}/test-room-setup.html`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use.`);
+    process.exit(1);
+  } else {
+    console.error('❌ Server error:', err);
+  }
+});inutes even if empty
         if (room.players.length === 0) {
           console.log(`Room ${roomId} is empty, will delete in 5 minutes`);
           setTimeout(() => {
