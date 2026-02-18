@@ -5,7 +5,7 @@ const urlsToCache = [
   '/login.html',
   '/css/IpL.css',
   '/js/Ipl.js',
-  '/js/fix-paths.js',
+  '/js/roomManager.js',
   '/manifest.json'
 ];
 
@@ -13,7 +13,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch(err => {
+          console.warn('Cache addAll failed:', err);
+        });
       })
   );
 });

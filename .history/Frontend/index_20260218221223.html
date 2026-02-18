@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="css/IpL.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff8c00">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 
@@ -64,7 +64,7 @@
                 </button>
             </div>
         </div>
-        <header style="display:none;">
+        <header>
             <div>
                 <h1>IPL Auction</h1>
                 <p class="small">INDIAN PREMIER LEAGUE</p>
@@ -75,7 +75,7 @@
         </header>
 
         <!-- TEAM SELECTION -->
-        <div id="team-selection" class="section" style="display:none;">
+        <div id="team-selection" class="section">
             <h3 style="margin:0 0 8px 0">1. Select Teams </h3>
 
             <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap">
@@ -229,6 +229,9 @@
     </div>
 
 
+    <!-- PeerJS for P2P multiplayer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+    
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <script>
