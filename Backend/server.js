@@ -36,10 +36,19 @@ const roomPlayers = new Map(); // socketId -> roomId
 
 // ================= SOCKET =================
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("✅ User connected:", socket.id);
+  
+  // Debug: Log ALL outgoing events for this socket
+  const originalEmit = socket.emit;
+  socket.emit = function(event, ...args) {
+    console.log('📤 Emitting to', socket.id, ':', event, args);
+    return originalEmit.apply(socket, [event, ...args]);
+  };
 
   // ---------- CREATE ROOM ----------
   socket.on("createRoom", (userData) => {
+    console.log('📥 createRoom event received from:', socket.id, 'userData:', userData);
+    
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     const generateRoomId = () => {
@@ -72,8 +81,9 @@ io.on("connection", (socket) => {
     roomPlayers.set(socket.id, roomId);
     socket.join(roomId);
 
+    console.log('📤 About to emit roomCreated to:', socket.id, 'with roomId:', roomId);
     socket.emit("roomCreated", { roomId });
-    console.log(`Room created: ${roomId}`);
+    console.log(`✅ Room created successfully: ${roomId} | Total rooms: ${rooms.size}`);
   });
 
   // ---------- JOIN ROOM ----------

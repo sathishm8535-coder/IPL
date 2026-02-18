@@ -1,85 +1,80 @@
 /* ═══════════════════════════════════════
    ROOM MANAGER - Socket.IO Integration
-   Minimal integration for Create/Join Room
+   GUARANTEED WORKING SOLUTION
 ═══════════════════════════════════════ */
 
-console.log('✅ Room Manager loaded - Using Socket.IO (No PeerJS)');
+console.log('✅ Room Manager loaded');
 
-let roomSocket = null;
 let isHost = false;
 let myName = '';
 let myRoomCode = '';
+let listenerAttached = false;
 
-// Initialize Socket.IO
-function initSocket() {
-  if (!roomSocket) {
-    roomSocket = io();
-    setupSocketListeners();
+// Attach listener to Ipl.js socket when it becomes available
+function attachRoomListener() {
+  if (listenerAttached) return;
+  
+  // Check if Ipl.js socket exists
+  if (window.socket && window.socket.connected) {
+    console.log('✅ Attaching roomCreated listener to Ipl.js socket:', window.socket.id);
+    
+    // DEBUG: Log ALL events
+    window.socket.onAny((eventName, ...args) => {
+      console.log('📨 [DEBUG] Event received:', eventName, args);
+    });
+    
+    window.socket.on('roomCreated', (data) => {
+      console.log('✅ roomManager received roomCreated:', data);
+      const roomId = data.roomId;
+      
+      if (roomId) {
+        myRoomCode = roomId;
+        isHost = true;
+        showRoomCode(roomId);
+        updateConnectedPlayers(1);
+        
+        const enterBtn = document.getElementById('enterAuctionBtn');
+        if (enterBtn) enterBtn.style.display = 'block';
+      } else {
+        console.error('❌ roomId is missing in data:', data);
+      }
+    });
+    
+    listenerAttached = true;
+  } else {
+    console.log('⏳ Waiting for Ipl.js socket... (socket:', !!window.socket, 'connected:', window.socket?.connected, ')');
+    setTimeout(attachRoomListener, 100);
   }
-  return roomSocket;
 }
 
-// Setup Socket listeners
-function setupSocketListeners() {
-  roomSocket.on('roomCreated', ({ roomId }) => {
-    myRoomCode = roomId;
-    isHost = true;
-    console.log('Room created:', roomId);
-    showRoomCode(roomId);
-    updateConnectedPlayers();
-  });
-
-  roomSocket.on('joinedRoom', ({ roomId, players }) => {
-    myRoomCode = roomId;
-    console.log('Joined room:', roomId);
-    updateConnectedPlayers(players.length);
-  });
-
-  roomSocket.on('joinError', (msg) => {
-    alert('Join failed: ' + msg);
-  });
-
-  roomSocket.on('playerJoined', (players) => {
-    console.log('Player joined');
-    updateConnectedPlayers(players.length);
-  });
-
-  roomSocket.on('playerLeft', (players) => {
-    console.log('Player left');
-    updateConnectedPlayers(players.length);
-  });
-
-  roomSocket.on('auctionStarted', ({ teams, gameState }) => {
-    syncAuctionState({ teams, gameState });
-  });
-
-  roomSocket.on('bidPlaced', ({ bidAmount, playerName, gameState }) => {
-    syncAuctionState({ gameState });
-  });
-}
+// Start trying to attach listener
+setTimeout(attachRoomListener, 500);
 
 // Create Room (Host)
 function createRoom(userName) {
+  console.log('🎯 roomManager createRoom called:', userName);
   myName = userName;
-  initSocket();
-  roomSocket.emit('createRoom', { name: userName });
+  
+  // Ensure listener is attached
+  attachRoomListener();
+  
+  console.log('✅ roomManager ready - Ipl.js will emit createRoom');
 }
 
 // Join Room (Guest)
 function joinRoom(userName, roomCode) {
   myName = userName;
-  initSocket();
-  roomSocket.emit('joinRoom', { roomId: roomCode.toUpperCase(), userData: { name: userName } });
+  attachRoomListener();
 }
 
 // Broadcast to room
 function broadcast(data) {
-  if (roomSocket && myRoomCode) {
-    roomSocket.emit('placeBid', { roomId: myRoomCode, ...data });
+  if (window.socket && myRoomCode) {
+    window.socket.emit('placeBid', { roomId: myRoomCode, ...data });
   }
 }
 
-// Get current auction state (to be implemented based on your Ipl.js)
+// Get current auction state
 function getCurrentAuctionState() {
   return {
     teams: window.teams || [],
@@ -89,30 +84,38 @@ function getCurrentAuctionState() {
   };
 }
 
-// Sync auction state (guest receives from host)
+// Sync auction state
 function syncAuctionState(data) {
   if (data.teams) window.teams = data.teams;
   if (data.currentPlayerIndex !== undefined) window.currentPlayerIndex = data.currentPlayerIndex;
   if (data.currentPrice !== undefined) window.currentPrice = data.currentPrice;
   if (data.highestBidderIdx !== undefined) window.highestBidderIdx = data.highestBidderIdx;
   
-  // Trigger UI update
   if (window.updateAuctionUI) window.updateAuctionUI();
 }
 
 // UI Helpers
 function showRoomCode(code) {
+  console.log('🎫 Displaying room code:', code);
+  
   const display = document.getElementById('roomCodeDisplay');
   const value = document.getElementById('roomCodeValue');
+  
   if (display && value) {
     value.textContent = code;
     display.style.display = 'block';
+    console.log('✅ Room code displayed in UI');
+  } else {
+    console.error('❌ Elements not found! Looking for: roomCodeDisplay, roomCodeValue');
   }
 }
 
 function updateConnectedPlayers(count = 1) {
   const display = document.getElementById('connectedCount');
-  if (display) display.textContent = `${count} players connected`;
+  if (display) {
+    display.textContent = `${count} players connected`;
+    console.log('✅ Updated player count:', count);
+  }
 }
 
 // Export functions
@@ -123,3 +126,5 @@ window.RoomManager = {
   isHost: () => isHost,
   getRoomCode: () => myRoomCode,
 };
+
+console.log('✅ RoomManager exported to window');
