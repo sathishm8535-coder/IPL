@@ -3853,17 +3853,7 @@ function updateLiveScoreboard() {
 let auctionEnded = false; // auction running by default
 
 /***********************
- * CALL DURING AUCTION
- * (points hidden)
- ***********************/
-function showLiveTable() {
-  auctionEnded = false;
-  renderWinnerTable();
-}
-
-/***********************
  * SHOW CURRENT STANDINGS
- * (can be called anytime)
  ***********************/
 function showCurrentStandings() {
   auctionEnded = false;
@@ -3962,3 +3952,113 @@ function renderWinnerTable() {
   
   console.log("Winner table rendered successfully!");
 }
+
+
+/* ═══════════════════════════════════════
+   ROOM INTEGRATION (PeerJS Multiplayer)
+═══════════════════════════════════════ */
+
+function handleCreateRoom() {
+  const name = document.getElementById('hostName').value.trim();
+  if (!name) { 
+    showNotification('Enter your name', 'error'); 
+    return; 
+  }
+  
+  if (window.RoomManager) {
+    window.RoomManager.createRoom(name);
+    document.getElementById('enterAuctionBtn').style.display = 'block';
+    showNotification(`Creating room as ${name}...`, 'info');
+  } else {
+    showNotification('Room Manager not loaded', 'error');
+  }
+}
+
+function handleJoinRoom() {
+  const name = document.getElementById('guestName').value.trim();
+  const code = document.getElementById('roomCodeInput').value.trim();
+  if (!name || !code) { 
+    showNotification('Enter name and room code', 'error'); 
+    return; 
+  }
+  
+  if (window.RoomManager) {
+    window.RoomManager.joinRoom(name, code);
+    document.getElementById('joinStatus').style.display = 'block';
+    document.getElementById('joinStatus').textContent = 'Connecting...';
+    setTimeout(() => {
+      document.getElementById('enterAuctionBtn').style.display = 'block';
+      document.getElementById('joinStatus').textContent = 'Connected! Click Enter Auction Room';
+    }, 1500);
+  } else {
+    showNotification('Room Manager not loaded', 'error');
+  }
+}
+
+function enterAuction() {
+  document.getElementById('room-lobby').style.display = 'none';
+  document.getElementById('team-selection').style.display = 'block';
+  showNotification('Welcome to the auction!', 'success');
+}
+
+function copyRoomCode() {
+  const code = window.RoomManager ? window.RoomManager.getRoomCode() : '';
+  if (!code) return;
+  
+  navigator.clipboard.writeText(code).then(() => {
+    showNotification(`Room code ${code} copied!`, 'success');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showNotification(`Copied: ${code}`, 'success');
+  });
+}
+
+// Broadcast auction state changes (call this after important actions)
+function broadcastAuctionState() {
+  if (window.RoomManager && window.RoomManager.isHost()) {
+    const event = new CustomEvent('auctionStateChange', {
+      detail: {
+        teams,
+        currentPlayerIndex,
+        currentPrice,
+        highestBidderIdx,
+      }
+    });
+    window.dispatchEvent(event);
+  }
+}
+
+// Update UI when state syncs from host
+window.updateAuctionUI = function() {
+  if (currentPlayerIndex < players.length) {
+    loadPlayer();
+  }
+  updateTeamsView();
+  updateLiveScoreboard();
+  populateBidButtons();
+};
+
+// Override bidNow to broadcast in multiplayer
+const originalBidNow = bidNow;
+bidNow = function(idx) {
+  originalBidNow(idx);
+  if (typeof broadcastAuctionState === 'function') {
+    broadcastAuctionState();
+  }
+};
+
+// Override assignPlayer to broadcast in multiplayer
+const originalAssignPlayer = assignPlayer;
+assignPlayer = function(skipped) {
+  originalAssignPlayer(skipped);
+  if (typeof broadcastAuctionState === 'function') {
+    broadcastAuctionState();
+  }
+};
+
+console.log('Room integration loaded successfully');
