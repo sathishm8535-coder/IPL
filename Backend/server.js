@@ -68,30 +68,25 @@ io.on("connection", (socket) => {
     
     roomId = roomId.toUpperCase().trim();
     
-    // Check roomData first (more reliable than Socket.io adapter)
     const data = roomData.get(roomId);
     if (!data) {
-      console.log(`❌ Room ${roomId} not found in roomData`);
-      console.log(`Available rooms:`, Array.from(roomData.keys()));
+      console.log(`❌ Room ${roomId} not found`);
       return socket.emit("joinError", "Room not found");
     }
 
-    // Check if already in room (reconnection)
     const room = io.sockets.adapter.rooms.get(roomId);
     if (room && room.has(socket.id)) {
-      console.log(`✅ ${socket.id} reconnecting to room ${roomId}`);
+      console.log(`✅ ${socket.id} already in room ${roomId}`);
       return socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
     }
 
-    // Join room
     socket.join(roomId);
     
-    // Add player if not already in list
     if (!data.players.find(p => p.socketId === socket.id)) {
       data.players.push({ socketId: socket.id, ...userData });
     }
 
-    console.log(`✅ ${socket.id} (${userData.name || 'User'}) joined room ${roomId}`);
+    console.log(`✅ ${socket.id} joined room ${roomId}`);
     socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
     socket.to(roomId).emit("playerJoined", { player: { socketId: socket.id, ...userData }, playerCount: data.players.length });
   });
@@ -146,7 +141,7 @@ io.on("connection", (socket) => {
         data.selectedTeams = data.selectedTeams.filter((t) => t.socketId !== socket.id);
         
         console.log(`🚪 ${socket.id} left room ${roomId}, ${data.players.length} players remaining`);
-        socket.to(roomId).emit("playerLeft", { players: data.players, playerCount: data.players.length });
+        socket.to(roomId).emit("playerLeft", { playerId: socket.id, players: data.players, playerCount: data.players.length, selectedTeams: data.selectedTeams.map(t => t.teamName) });
         
         // Delete room after 5 minutes if empty
         if (data.players.length === 0) {

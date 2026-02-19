@@ -3761,6 +3761,12 @@ if (joinBtn) {
       return;
     }
     
+    // Prevent joining if already in a room
+    if (currentRoomId === id) {
+      showNotification('You are already in this room!', 'info');
+      return;
+    }
+    
     if (!socket || !socket.connected) {
       showNotification('Connecting...', 'info');
       initializeSocket();
