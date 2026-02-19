@@ -82,7 +82,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
 
     console.log('📤 About to emit roomCreated to:', socket.id, 'with roomId:', roomId);
-    socket.emit("roomCreated", { roomId });
+    socket.emit("roomCreated", { roomId, totalRooms: rooms.size });
     console.log(`✅ Room created successfully: ${roomId} | Total rooms: ${rooms.size}`);
   });
 
