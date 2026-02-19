@@ -3511,13 +3511,8 @@ function updateServerStatus(message, color) {
 }
 
 function setupSocketListeners() {
-  socket.on('roomCreated', (data) => {
-    console.log('✅ Room created event received:', data);
-    console.log('✅ Data type:', typeof data);
-    
-    // Handle both string and object formats
-    const roomId = typeof data === 'string' ? data : data.roomId;
-    console.log('✅ Room ID:', roomId);
+  socket.on('roomCreated', (roomId) => {
+    console.log('✅ Room created:', roomId);
     
     currentRoomId = roomId;
     isRoomHost = true;
@@ -3527,13 +3522,9 @@ function setupSocketListeners() {
     const connectedCount = document.getElementById('connectedCount');
     const enterBtn = document.getElementById('enterAuctionBtn');
     
-    console.log('Elements found:', { roomCodeDisplay: !!roomCodeDisplay, roomCodeValue: !!roomCodeValue });
-    
     if (roomCodeValue) {
       roomCodeValue.textContent = roomId;
       console.log('✅ Room code displayed:', roomId);
-    } else {
-      console.error('❌ roomCodeValue element not found!');
     }
     
     if (roomCodeDisplay) roomCodeDisplay.style.display = 'block';

@@ -43,8 +43,8 @@
                     </button>
                     <div id="roomCodeDisplay" style="display:none; margin-top:15px; padding:15px; background:#fffbea; border:2px dashed #f5c518; border-radius:8px; text-align:center;">
                         <div style="font-size:12px; color:#666; margin-bottom:5px;">Room Code (Click to copy)</div>
-                        <div id="roomCodeValue" onclick="copyRoomCode()" style="font-size:28px; font-weight:bold; color:#f5c518; cursor:pointer; letter-spacing:3px; font-family:monospace;"></div>
-                        <div style="font-size:11px; color:#999; margin-top:5px;">📋 Share this with friends</div>
+                        <div id="roomCodeValue" onclick="copyRoomCode()" style="font-size:32px; font-weight:bold; color:#f5c518; cursor:pointer; letter-spacing:6px; font-family:'Courier New',Consolas,monospace; background:#fff; padding:10px; border-radius:6px;"></div>
+                        <div style="font-size:11px; color:#999; margin-top:8px;">📋 Share • Uses 0 (zero) not O (letter)</div>
                     </div>
                 </div>
                 
@@ -52,7 +52,7 @@
                 <div style="flex:1; min-width:280px; max-width:400px; border:2px solid #3d7fff; padding:20px; border-radius:12px; background:#fff;">
                     <h3 style="margin:0 0 15px 0; color:#3d7fff;">🤝 Join Room</h3>
                     <input type="text" id="guestName" placeholder="Your Name" style="width:100%; margin:10px 0; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:14px;">
-                    <input type="text" id="roomCodeInput" placeholder="Room Code (e.g. ABC123)" maxlength="8" style="width:100%; margin:10px 0; padding:10px; border:1px solid #ccc; border-radius:6px; text-transform:uppercase; font-family:monospace; letter-spacing:2px; font-size:16px; text-align:center;" oninput="this.value=this.value.toUpperCase()">
+                    <input type="text" id="roomCodeInput" placeholder="Room Code (e.g. ABC123)" maxlength="8" style="width:100%; margin:10px 0; padding:12px; border:2px solid #ccc; border-radius:6px; text-transform:uppercase; font-family:'Courier New',Consolas,monospace; letter-spacing:4px; font-size:20px; text-align:center; font-weight:bold;" oninput="this.value=this.value.toUpperCase()">
                     <button onclick="handleJoinRoom()" style="width:100%; padding:12px; background:#3d7fff; color:white; border:none; cursor:pointer; border-radius:6px; font-weight:bold; font-size:15px;">
                         🚀 Join Room
                     </button>
@@ -260,7 +260,7 @@
         }
     </script>
 
-    <script src="js/Ipl.js?v=7"></script>
+    <script src="js/Ipl.js?v=9"></script>
 </body>
 
 </html>
