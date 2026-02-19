@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ipl-auction-v3';
+const CACHE_NAME = 'ipl-auction-v4';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -21,13 +21,25 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip Socket.IO and external requests
+  if (event.request.url.includes('socket.io') || 
+      event.request.url.includes('cdn.') ||
+      !event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        return response || fetch(event.request);
-      })
-      .catch(() => {
-        return fetch(event.request);
+        if (response) return response;
+        
+        // Clone the request
+        const fetchRequest = event.request.clone();
+        
+        return fetch(fetchRequest).catch(() => {
+          // Return offline page or cached version
+          return caches.match('/index.html');
+        });
       })
   );
 });
