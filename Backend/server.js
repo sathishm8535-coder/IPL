@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: true,
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -21,7 +21,7 @@ const io = new Server(server, {
   maxHttpBufferSize: 1e6
 });
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../Frontend")));
 

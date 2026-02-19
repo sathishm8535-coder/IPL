@@ -3475,18 +3475,20 @@ function initializeSocket() {
     socket = null;
   }
   
-  // Auto-detect server URL (works for both localhost and Render)
-  const serverUrl = window.location.origin;
+  // 🔥 REPLACE THIS WITH YOUR ACTUAL RENDER URL
+  const serverUrl = 'https://your-backend.onrender.com';
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
     upgrade: true,
     rememberUpgrade: true,
     reconnection: true,
-    reconnectionAttempts: 10,
+    reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
     timeout: 20000,
-    forceNew: false
+    forceNew: false,
+    autoConnect: true
   });
   
   updateServerStatus('🔄 Connecting...', '#ff8c00');
@@ -3496,13 +3498,23 @@ function initializeSocket() {
     updateServerStatus('✅ Connected', '#4CAF50');
   });
 
-  socket.on('disconnect', () => {
-    console.log('❌ Disconnected from server');
+  socket.on('disconnect', (reason) => {
+    console.log('❌ Disconnected:', reason);
     updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
   });
 
+  socket.on('reconnect_attempt', (attempt) => {
+    console.log(`🔄 Reconnection attempt ${attempt}`);
+    updateServerStatus(`🔄 Reconnecting... (${attempt})`, '#ff8c00');
+  });
+
+  socket.on('reconnect', (attempt) => {
+    console.log(`✅ Reconnected after ${attempt} attempts`);
+    updateServerStatus('✅ Reconnected', '#4CAF50');
+  });
+
   socket.on('connect_error', (error) => {
-    console.error('Connection error:', error);
+    console.error('Connection error:', error.message);
     updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
   });
 
