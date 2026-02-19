@@ -3618,10 +3618,10 @@ function setupSocketListeners() {
     const joinStatus = document.getElementById('joinStatus');
     if (joinStatus) {
       joinStatus.style.display = 'block';
-      joinStatus.innerHTML = `<div style="color:#f44336">Failed to join: ${error}</div>`;
+      joinStatus.innerHTML = `<div style="color:#f44336">❌ ${error}</div>`;
     }
     
-    showNotification(`Join Error: ${error}`, 'error');
+    showNotification(`Error: ${error}`, 'error');
     isMultiplayer = false;
     currentRoomId = null;
     isRoomHost = false;
@@ -3770,12 +3770,6 @@ if (joinBtn) {
     const id = roomInput.value.trim().toUpperCase();
     if (!id) {
       showNotification('Enter a Room ID to join!', 'error');
-      return;
-    }
-    
-    // Prevent joining if already in a room
-    if (currentRoomId === id) {
-      showNotification('You are already in this room!', 'info');
       return;
     }
     

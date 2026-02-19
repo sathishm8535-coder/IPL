@@ -24,90 +24,96 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'Frontend/login.html'));
 });
 
-const rooms = new Map();
+const rooms = {};
+
+function checkRoomReadiness(roomId) {
+  const room = rooms[roomId];
+  if (!room) return;
+  
+  if (room.players.length >= 2) {
+    io.to(roomId).emit('gameReady', { playerCount: room.players.length });
+    console.log(`✅ Room ${roomId} is ready with ${room.players.length} players`);
+  } else {
+    io.to(roomId).emit('waitingForPlayers', { playerCount: room.players.length });
+    console.log(`⏳ Room ${roomId} waiting for players (${room.players.length}/2)`);
+  }
+}
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('✅ User connected:', socket.id);
 
-  socket.on('createRoom', (userData) => {
+  socket.on("createRoom", (userData) => {
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    console.log('Creating room:', roomId);
-    rooms.set(roomId, {
-      id: roomId,
+
+    rooms[roomId] = {
       players: [{ socketId: socket.id, userData: userData || { name: 'Anonymous' } }],
       gameState: { 
         currentPlayerIndex: 0, 
         currentPrice: 0,
-        phase: 'team_selection', // team_selection, auction, completed
-        selectedTeams: [], // Track selected IPL teams
-        teams: [], // Final team configurations
+        phase: 'team_selection',
+        selectedTeams: [],
+        teams: [],
         highestBidderIdx: -1
       }
-    });
+    };
+
     socket.join(roomId);
-    socket.emit('roomCreated', roomId);
-    console.log('Room created successfully:', roomId, 'Total rooms:', rooms.size);
+
+    console.log("🏠 Room created:", roomId);
+    socket.emit("roomCreated", roomId);
+    
+    checkRoomReadiness(roomId);
   });
 
-  socket.on('joinRoom', (data) => {
-    console.log('Join room request:', data);
-    const { roomId, userData } = data;
-    
+  socket.on("joinRoom", (data) => {
+    const roomId = (typeof data === 'string' ? data : data.roomId)?.toUpperCase().trim();
+    const userData = typeof data === 'object' ? data.userData : null;
+
     if (!roomId) {
-      console.log('No room ID provided');
-      socket.emit('joinError', 'Room ID is required');
-      return;
+      return socket.emit("joinError", "Invalid room ID");
     }
-    
-    const upperRoomId = roomId.toString().toUpperCase().trim();
-    console.log('Looking for room:', upperRoomId);
-    console.log('Available rooms:', Array.from(rooms.keys()));
-    
-    const room = rooms.get(upperRoomId);
+
+    console.log("🔍 Trying to join:", roomId);
+    console.log("📊 Available rooms:", Object.keys(rooms));
+
+    const room = rooms[roomId];
     
     if (!room) {
-      console.log('Room not found!');
-      socket.emit('joinError', 'Room not found');
-      return;
+      console.log("❌ Room not found:", roomId);
+      return socket.emit("joinError", "Room not found");
     }
-    
-    if (room.players.length >= 10) {
-      console.log('Room is full');
-      socket.emit('joinError', 'Room is full (max 10 players)');
-      return;
-    }
-    
-    // Check if player already in room
+
+    // Check if already in room
     const existingPlayer = room.players.find(p => p.socketId === socket.id);
     if (existingPlayer) {
-      console.log('Player already in room');
-      socket.emit('joinError', 'You are already in this room');
+      console.log("🔄 Player reconnecting:", roomId);
+      socket.join(roomId);
+      socket.emit("joinedRoom", { roomId, players: room.players, gameState: room.gameState });
+      checkRoomReadiness(roomId);
       return;
     }
-    
-    // Add player to room
+
+    // Check room capacity (max 10 players)
+    if (room.players.length >= 10) {
+      console.log("❌ Room full:", roomId);
+      return socket.emit("joinError", "Room is full");
+    }
+
     room.players.push({ socketId: socket.id, userData: userData || { name: 'Anonymous' } });
-    socket.join(upperRoomId);
-    
-    socket.emit('joinedRoom', {
-      roomId: upperRoomId,
-      players: room.players,
-      gameState: room.gameState
-    });
-    
-    socket.to(upperRoomId).emit('playerJoined', {
-      playerId: socket.id,
-      playerCount: room.players.length,
-      newPlayer: userData
-    });
-    
-    console.log('Player joined room successfully:', upperRoomId, 'Total players:', room.players.length);
+    socket.join(roomId);
+
+    console.log("✅ Player joined:", roomId, "| Players:", room.players.length);
+
+    socket.emit("joinedRoom", { roomId, players: room.players, gameState: room.gameState });
+    socket.to(roomId).emit("playerJoined", { player: { socketId: socket.id, ...userData }, playerCount: room.players.length });
+
+    checkRoomReadiness(roomId);
   });
 
   // Team selection synchronization
   socket.on('selectTeam', (data) => {
     const { roomId, teamName, playerInfo } = data;
-    const room = rooms.get(roomId);
+    const room = rooms[roomId];
     
     if (!room) {
       socket.emit('teamSelectError', 'Room not found');
@@ -136,7 +142,7 @@ io.on('connection', (socket) => {
 
   socket.on('startAuction', (data) => {
     const { roomId, teams } = data;
-    const room = rooms.get(roomId);
+    const room = rooms[roomId];
     if (room) {
       room.gameState.teams = teams;
       room.gameState.phase = 'auction';
@@ -154,7 +160,7 @@ io.on('connection', (socket) => {
 
   socket.on('placeBid', (data) => {
     const { roomId, bidAmount, teamIndex, playerName, socketId } = data;
-    const room = rooms.get(roomId);
+    const room = rooms[roomId];
     if (room && room.gameState.phase === 'auction') {
       room.gameState.currentPrice = bidAmount;
       room.gameState.highestBidderIdx = teamIndex;
@@ -171,7 +177,7 @@ io.on('connection', (socket) => {
 
   socket.on('playerAssigned', (data) => {
     const { roomId, player, winningTeam, price, skipped } = data;
-    const room = rooms.get(roomId);
+    const room = rooms[roomId];
     if (room) {
       // Update room's game state
       if (winningTeam && !skipped) {
@@ -188,7 +194,7 @@ io.on('connection', (socket) => {
 
   socket.on('nextPlayer', (data) => {
     const { roomId, playerIndex } = data;
-    const room = rooms.get(roomId);
+    const room = rooms[roomId];
     if (room) {
       room.gameState.currentPlayerIndex = playerIndex;
       room.gameState.currentPrice = 0;
@@ -203,18 +209,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('❌ User disconnected:', socket.id);
     
     // Remove player from all rooms
-    for (const [roomId, room] of rooms.entries()) {
+    for (const roomId in rooms) {
+      const room = rooms[roomId];
       const playerIndex = room.players.findIndex(p => p.socketId === socket.id);
       if (playerIndex !== -1) {
         const disconnectedPlayer = room.players[playerIndex];
         room.players.splice(playerIndex, 1);
-        console.log('Removed player from room:', roomId, 'Remaining players:', room.players.length);
         
-        // Remove any team selections by this player
-        // Note: In a real implementation, you might want to handle this differently
+        console.log('🚪 Player left room:', roomId, '| Remaining:', room.players.length);
         
         // Notify other players
         socket.to(roomId).emit('playerLeft', {
@@ -223,11 +228,16 @@ io.on('connection', (socket) => {
           playerData: disconnectedPlayer.userData
         });
         
-        // Delete room if empty
+        // Check if room should be deleted or needs more players
         if (room.players.length === 0) {
-          rooms.delete(roomId);
-          console.log('Deleted empty room:', roomId);
+          delete rooms[roomId];
+          console.log('🗑️ Deleted empty room:', roomId, '| Total rooms:', Object.keys(rooms).length);
+        } else {
+          // Check readiness (will emit waitingForPlayers if < 2 players)
+          checkRoomReadiness(roomId);
         }
+        
+        break;
       }
     }
   });
