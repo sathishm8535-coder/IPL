@@ -3466,7 +3466,7 @@ let selectedTeamsInRoom = [];
 let playersInRoom = [];
 let isRoomHost = false;
 
-// Initialize socket connection with aggressive retry
+// Initialize socket connection for production (Render)
 function initializeSocket() {
   if (socket && socket.connected) return;
   
@@ -3475,27 +3475,34 @@ function initializeSocket() {
     socket = null;
   }
   
-  socket = io(window.location.origin, {
-    transports: ['polling'],
-    timeout: 5000,
+  // Auto-detect server URL (works for both localhost and Render)
+  const serverUrl = window.location.origin;
+  
+  socket = io(serverUrl, {
+    transports: ['websocket', 'polling'],
+    upgrade: true,
+    rememberUpgrade: true,
     reconnection: true,
-    reconnectionAttempts: 50,
-    reconnectionDelay: 500,
-    forceNew: true
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
+    timeout: 20000,
+    forceNew: false
   });
   
   updateServerStatus('🔄 Connecting...', '#ff8c00');
 
   socket.on('connect', () => {
+    console.log('✅ Connected to server');
     updateServerStatus('✅ Connected', '#4CAF50');
   });
 
   socket.on('disconnect', () => {
+    console.log('❌ Disconnected from server');
     updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
-    setTimeout(() => socket.connect(), 1000);
   });
 
-  socket.on('connect_error', () => {
+  socket.on('connect_error', (error) => {
+    console.error('Connection error:', error);
     updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
   });
 

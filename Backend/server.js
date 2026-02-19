@@ -11,10 +11,14 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
+    credentials: true
   },
-  transports: ["websocket", "polling"],
+  transports: ['websocket', 'polling'],
+  allowUpgrades: true,
   pingTimeout: 60000,
   pingInterval: 25000,
+  connectTimeout: 45000,
+  maxHttpBufferSize: 1e6
 });
 
 app.use(cors());
@@ -63,28 +67,29 @@ io.on("connection", (socket) => {
     if (!roomId) return socket.emit("joinError", "Room ID required");
     
     roomId = roomId.toUpperCase().trim();
-    const room = io.sockets.adapter.rooms.get(roomId);
     
-    if (!room) {
-      console.log(`❌ Room ${roomId} not found`);
-      return socket.emit("joinError", "Room not found");
-    }
-
+    // Check roomData first (more reliable than Socket.io adapter)
     const data = roomData.get(roomId);
     if (!data) {
-      console.log(`❌ Room data for ${roomId} not found`);
+      console.log(`❌ Room ${roomId} not found in roomData`);
+      console.log(`Available rooms:`, Array.from(roomData.keys()));
       return socket.emit("joinError", "Room not found");
     }
 
-    // Allow same socket to rejoin (reconnection scenario)
-    if (room.has(socket.id)) {
+    // Check if already in room (reconnection)
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (room && room.has(socket.id)) {
       console.log(`✅ ${socket.id} reconnecting to room ${roomId}`);
       return socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
     }
 
-    // Join room (each socket.id is unique per device/connection)
+    // Join room
     socket.join(roomId);
-    data.players.push({ socketId: socket.id, ...userData });
+    
+    // Add player if not already in list
+    if (!data.players.find(p => p.socketId === socket.id)) {
+      data.players.push({ socketId: socket.id, ...userData });
+    }
 
     console.log(`✅ ${socket.id} (${userData.name || 'User'}) joined room ${roomId}`);
     socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
@@ -132,14 +137,20 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    console.log(`❌ User disconnected: ${socket.id}`);
+    
     for (const [roomId, data] of roomData.entries()) {
       const playerIndex = data.players.findIndex((p) => p.socketId === socket.id);
       if (playerIndex !== -1) {
         data.players.splice(playerIndex, 1);
         data.selectedTeams = data.selectedTeams.filter((t) => t.socketId !== socket.id);
-        socket.to(roomId).emit("playerLeft", data.players);
         
+        console.log(`🚪 ${socket.id} left room ${roomId}, ${data.players.length} players remaining`);
+        socket.to(roomId).emit("playerLeft", { players: data.players, playerCount: data.players.length });
+        
+        // Delete room after 5 minutes if empty
         if (data.players.length === 0) {
+          console.log(`⏰ Room ${roomId} is empty, will delete in 5 minutes`);
           setTimeout(() => {
             if (roomData.has(roomId) && roomData.get(roomId).players.length === 0) {
               roomData.delete(roomId);
@@ -154,6 +165,9 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🔥 Server running on port ${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+server.listen(PORT, HOST, () => {
+  console.log(`🔥 Server running on ${HOST}:${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
