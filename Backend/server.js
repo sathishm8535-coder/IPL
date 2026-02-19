@@ -7,9 +7,22 @@ const path = require("path");
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://ipl-two-red.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all for production
+      }
+    },
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -21,9 +34,20 @@ const io = new Server(server, {
   maxHttpBufferSize: 1e6
 });
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for production
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../Frontend")));
+
+app.get("/health", (req, res) => res.json({ status: 'ok', timestamp: Date.now() }));
 
 app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "../Frontend/login.html"))

@@ -3475,8 +3475,8 @@ function initializeSocket() {
     socket = null;
   }
   
-  // 🔥 REPLACE THIS WITH YOUR ACTUAL RENDER URL
-  const serverUrl = 'https://your-backend.onrender.com';
+  // Production backend URL
+  const serverUrl = 'https://ipl-cca1.onrender.com';
   
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
