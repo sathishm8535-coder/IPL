@@ -105,10 +105,13 @@ io.on("connection", (socket) => {
     socket.emit("joinedRoom", {
       roomId,
       players: room.players,
-      selectedTeams: room.selectedTeams,
+      selectedTeams: room.selectedTeams.map(t => t.teamName),
     });
 
-    socket.to(roomId).emit("playerJoined", room.players);
+    socket.to(roomId).emit("playerJoined", {
+      player: { socketId: socket.id, ...userData },
+      playerCount: room.players.length
+    });
   });
 
   // ---------- TEAM SELECT ----------
@@ -144,7 +147,7 @@ io.on("connection", (socket) => {
   });
 
   // ---------- PLACE BID ----------
-  socket.on("placeBid", ({ roomId, bidAmount, playerName }) => {
+  socket.on("placeBid", ({ roomId, bidAmount, teamIndex, playerName, socketId }) => {
     const room = rooms.get(roomId);
     if (!room || !room.gameState.isActive) return;
 
@@ -154,21 +157,39 @@ io.on("connection", (socket) => {
 
     io.to(roomId).emit("bidPlaced", {
       bidAmount,
+      teamIndex,
       playerName,
+      socketId,
       gameState: room.gameState,
     });
   });
 
   // ---------- NEXT PLAYER ----------
-  socket.on("nextPlayer", ({ roomId }) => {
+  socket.on("nextPlayer", ({ roomId, playerIndex }) => {
     const room = rooms.get(roomId);
     if (!room) return;
 
-    room.gameState.currentPlayerIndex++;
+    room.gameState.currentPlayerIndex = playerIndex;
     room.gameState.currentPrice = 0;
     room.gameState.highestBidder = null;
 
-    io.to(roomId).emit("playerChanged", room.gameState);
+    io.to(roomId).emit("nextPlayer", {
+      playerIndex,
+      gameState: room.gameState,
+    });
+  });
+
+  // ---------- PLAYER ASSIGNED ----------
+  socket.on("playerAssigned", ({ roomId, player, winningTeam, price, skipped }) => {
+    const room = rooms.get(roomId);
+    if (!room) return;
+
+    io.to(roomId).emit("playerAssigned", {
+      player,
+      winningTeam,
+      price,
+      skipped,
+    });
   });
 
   // ---------- DISCONNECT ----------

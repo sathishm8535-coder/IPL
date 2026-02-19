@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title> IPL Auction </title>
     <link rel="icon" type="image/jpeg" href="assets/icon.jpg">
     <link rel="stylesheet" href="css/IpL.css">
@@ -246,10 +249,18 @@
         }
     </script>
 
-    <!-- Room Manager (must load before Ipl.js) -->
-    <script src="js/roomManager.js"></script>
-    
-    <script src="js/Ipl.js"></script>
+    <script>
+        // Unregister old service worker to clear cache
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+    </script>
+
+    <script src="js/Ipl.js?v=5"></script>
 </body>
 
 </html>

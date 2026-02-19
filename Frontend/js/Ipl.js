@@ -3515,12 +3515,18 @@ function setupSocketListeners() {
     console.log('Room created:', data);
     currentRoomId = data.roomId;
     isRoomHost = true;
-    document.getElementById('roomId').value = data.roomId || 'ERROR';
-    document.getElementById('roomStatus').innerHTML = `
-      <div style="color:#4CAF50;font-weight:bold">Room Created: ${data.roomId || 'ERROR'}</div>
-      <div style="font-size:12px;color:var(--muted)">Share this Room ID with friends • ${data.playerCount} player(s) connected</div>
-    `;
-    showNotification(`Room Created: ${data.roomId || 'ERROR'}`, 'success');
+    
+    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+    const roomCodeValue = document.getElementById('roomCodeValue');
+    const connectedCount = document.getElementById('connectedCount');
+    const enterBtn = document.getElementById('enterAuctionBtn');
+    
+    if (roomCodeValue) roomCodeValue.textContent = data.roomId;
+    if (roomCodeDisplay) roomCodeDisplay.style.display = 'block';
+    if (connectedCount) connectedCount.textContent = '1 players connected';
+    if (enterBtn) enterBtn.style.display = 'block';
+    
+    showNotification(`Room Created: ${data.roomId}`, 'success');
     isMultiplayer = true;
     selectedTeamsInRoom = [];
     playersInRoom = [playerData];
@@ -3584,10 +3590,13 @@ function setupSocketListeners() {
 
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
-    document.getElementById('roomStatus').innerHTML = `
-      <div style="color:#f44336;font-weight:bold">Failed to join room</div>
-      <div style="font-size:12px;color:var(--muted)">${error}</div>
-    `;
+    
+    const joinStatus = document.getElementById('joinStatus');
+    if (joinStatus) {
+      joinStatus.style.display = 'block';
+      joinStatus.innerHTML = `<div style="color:#f44336">Failed to join: ${error}</div>`;
+    }
+    
     showNotification(`Join Error: ${error}`, 'error');
     isMultiplayer = false;
     currentRoomId = null;
@@ -3965,12 +3974,18 @@ function handleCreateRoom() {
     return; 
   }
   
-  if (window.RoomManager) {
-    window.RoomManager.createRoom(name);
-    document.getElementById('enterAuctionBtn').style.display = 'block';
-    showNotification(`Creating room as ${name}...`, 'info');
+  if (!socket || !socket.connected) {
+    showNotification('Connecting to server...', 'info');
+    initializeSocket();
+    setTimeout(() => {
+      if (socket && socket.connected) {
+        socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() });
+      } else {
+        showNotification('Connection failed - Try again', 'error');
+      }
+    }, 2000);
   } else {
-    showNotification('Room Manager not loaded', 'error');
+    socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || socket.id });
   }
 }
 
@@ -3982,16 +3997,18 @@ function handleJoinRoom() {
     return; 
   }
   
-  if (window.RoomManager) {
-    window.RoomManager.joinRoom(name, code);
-    document.getElementById('joinStatus').style.display = 'block';
-    document.getElementById('joinStatus').textContent = 'Connecting...';
+  if (!socket || !socket.connected) {
+    showNotification('Connecting...', 'info');
+    initializeSocket();
     setTimeout(() => {
-      document.getElementById('enterAuctionBtn').style.display = 'block';
-      document.getElementById('joinStatus').textContent = 'Connected! Click Enter Auction Room';
-    }, 1500);
+      if (socket && socket.connected) {
+        socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() } });
+      } else {
+        showNotification('Connection failed - Try again', 'error');
+      }
+    }, 2000);
   } else {
-    showNotification('Room Manager not loaded', 'error');
+    socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || socket.id } });
   }
 }
 
@@ -4002,9 +4019,9 @@ function enterAuction() {
 }
 
 function copyRoomCode() {
-  const code = window.RoomManager ? window.RoomManager.getRoomCode() : '';
-  if (!code) return;
-  
+  const codeEl = document.getElementById('roomCodeValue');
+  if (!codeEl || !codeEl.textContent) return;
+  const code = codeEl.textContent.trim();
   navigator.clipboard.writeText(code).then(() => {
     showNotification(`Room code ${code} copied!`, 'success');
   }).catch(() => {
