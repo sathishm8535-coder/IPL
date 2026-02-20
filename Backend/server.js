@@ -57,8 +57,6 @@ app.get("/game", (req, res) =>
   res.sendFile(path.join(__dirname, "../Frontend/index.html"))
 );
 
-const roomData = new Map();
-
 function generateRoomId() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let id = "";
@@ -74,15 +72,9 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (userData) => {
     const roomId = generateRoomId();
     socket.join(roomId);
+    socket.data.roomId = roomId;
+    socket.data.userData = userData;
     
-    roomData.set(roomId, {
-      host: socket.id,
-      players: [{ socketId: socket.id, ...userData }],
-      selectedTeams: [],
-      teams: [],
-      gameState: { isActive: false, currentPlayerIndex: 0, currentPrice: 0, highestBidder: null, timer: 10 },
-    });
-
     console.log(`🏠 Room ${roomId} created by ${socket.id}`);
     socket.emit("roomCreated", roomId);
   });
@@ -91,93 +83,114 @@ io.on("connection", (socket) => {
     if (!roomId) return socket.emit("joinError", "Room ID required");
     
     roomId = roomId.toUpperCase().trim();
+    const room = io.sockets.adapter.rooms.get(roomId);
     
-    const data = roomData.get(roomId);
-    if (!data) {
+    if (!room) {
       console.log(`❌ Room ${roomId} not found`);
       return socket.emit("joinError", "Room not found");
     }
 
-    const room = io.sockets.adapter.rooms.get(roomId);
-    if (room && room.has(socket.id)) {
+    if (room.has(socket.id)) {
       console.log(`✅ ${socket.id} already in room ${roomId}`);
-      return socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
+      const players = [];
+      const selectedTeams = [];
+      for (const socketId of room) {
+        const s = io.sockets.sockets.get(socketId);
+        if (s?.data.userData) {
+          players.push({ socketId, ...s.data.userData });
+          if (s.data.selectedTeam) selectedTeams.push(s.data.selectedTeam);
+        }
+      }
+      return socket.emit("joinedRoom", { roomId, players, selectedTeams });
+    }
+
+    if (room.size >= 2) {
+      console.log(`❌ Room ${roomId} is full`);
+      return socket.emit("joinError", "Room is full (max 2 players)");
     }
 
     socket.join(roomId);
+    socket.data.roomId = roomId;
+    socket.data.userData = userData;
+
+    const players = [];
+    const selectedTeams = [];
     
-    if (!data.players.find(p => p.socketId === socket.id)) {
-      data.players.push({ socketId: socket.id, ...userData });
+    for (const socketId of room) {
+      const s = io.sockets.sockets.get(socketId);
+      if (s?.data.userData) {
+        players.push({ socketId, ...s.data.userData });
+        if (s.data.selectedTeam) selectedTeams.push(s.data.selectedTeam);
+      }
     }
 
-    console.log(`✅ ${socket.id} joined room ${roomId}`);
-    socket.emit("joinedRoom", { roomId, players: data.players, selectedTeams: data.selectedTeams.map(t => t.teamName) });
-    socket.to(roomId).emit("playerJoined", { player: { socketId: socket.id, ...userData }, playerCount: data.players.length });
+    console.log(`✅ ${socket.id} joined room ${roomId} (${room.size}/2 players)`);
+    socket.emit("joinedRoom", { roomId, players, selectedTeams });
+    socket.to(roomId).emit("playerJoined", { player: { socketId: socket.id, ...userData }, playerCount: room.size });
   });
 
   socket.on("selectTeam", ({ roomId, teamName, playerInfo }) => {
-    const data = roomData.get(roomId);
-    if (!data) return;
-    data.selectedTeams = data.selectedTeams.filter((t) => t.socketId !== socket.id);
-    data.selectedTeams.push({ socketId: socket.id, teamName, playerInfo });
-    io.to(roomId).emit("teamSelected", { teamName, socketId: socket.id, selectedTeams: data.selectedTeams.map((t) => t.teamName) });
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room) return;
+    
+    socket.data.selectedTeam = teamName;
+    
+    const selectedTeams = [];
+    for (const socketId of room) {
+      const s = io.sockets.sockets.get(socketId);
+      if (s && s.data.selectedTeam) {
+        selectedTeams.push(s.data.selectedTeam);
+      }
+    }
+    
+    io.to(roomId).emit("teamSelected", { teamName, socketId: socket.id, selectedTeams, playerInfo });
   });
 
   socket.on("startAuction", ({ roomId, teams }) => {
-    const data = roomData.get(roomId);
-    if (!data) return;
-    data.teams = teams;
-    data.gameState.isActive = true;
-    io.to(roomId).emit("auctionStarted", { teams, gameState: data.gameState });
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room) return;
+    
+    socket.data.teams = teams;
+    io.to(roomId).emit("auctionStarted", { teams, gameState: { isActive: true, currentPlayerIndex: 0 } });
   });
 
   socket.on("placeBid", ({ roomId, bidAmount, teamIndex, playerName, socketId }) => {
-    const data = roomData.get(roomId);
-    if (!data || !data.gameState.isActive) return;
-    data.gameState.currentPrice = bidAmount;
-    data.gameState.highestBidder = playerName;
-    data.gameState.timer = 10;
-    io.to(roomId).emit("bidPlaced", { bidAmount, teamIndex, playerName, socketId, gameState: data.gameState });
+    io.to(roomId).emit("bidPlaced", { bidAmount, teamIndex, playerName, socketId });
   });
 
   socket.on("nextPlayer", ({ roomId, playerIndex }) => {
-    const data = roomData.get(roomId);
-    if (!data) return;
-    data.gameState.currentPlayerIndex = playerIndex;
-    data.gameState.currentPrice = 0;
-    data.gameState.highestBidder = null;
-    io.to(roomId).emit("nextPlayer", { playerIndex, gameState: data.gameState });
+    io.to(roomId).emit("nextPlayer", { playerIndex });
   });
 
   socket.on("playerAssigned", ({ roomId, player, winningTeam, price, skipped }) => {
-    const data = roomData.get(roomId);
-    if (!data) return;
     io.to(roomId).emit("playerAssigned", { player, winningTeam, price, skipped });
   });
 
   socket.on("disconnect", () => {
     console.log(`❌ User disconnected: ${socket.id}`);
     
-    for (const [roomId, data] of roomData.entries()) {
-      const playerIndex = data.players.findIndex((p) => p.socketId === socket.id);
-      if (playerIndex !== -1) {
-        data.players.splice(playerIndex, 1);
-        data.selectedTeams = data.selectedTeams.filter((t) => t.socketId !== socket.id);
+    const roomId = socket.data.roomId;
+    if (roomId) {
+      const room = io.sockets.adapter.rooms.get(roomId);
+      const playerCount = room ? room.size : 0;
+      
+      console.log(`🚪 ${socket.id} left room ${roomId}, ${playerCount} players remaining`);
+      
+      if (room) {
+        const selectedTeams = [];
+        const players = [];
         
-        console.log(`🚪 ${socket.id} left room ${roomId}, ${data.players.length} players remaining`);
-        socket.to(roomId).emit("playerLeft", { playerId: socket.id, players: data.players, playerCount: data.players.length, selectedTeams: data.selectedTeams.map(t => t.teamName) });
-        
-        // Delete room after 5 minutes if empty
-        if (data.players.length === 0) {
-          console.log(`⏰ Room ${roomId} is empty, will delete in 5 minutes`);
-          setTimeout(() => {
-            if (roomData.has(roomId) && roomData.get(roomId).players.length === 0) {
-              roomData.delete(roomId);
-              console.log(`🗑️ Room ${roomId} deleted`);
+        for (const socketId of room) {
+          const s = io.sockets.sockets.get(socketId);
+          if (s && s.data.userData) {
+            players.push({ socketId, ...s.data.userData });
+            if (s.data.selectedTeam) {
+              selectedTeams.push(s.data.selectedTeam);
             }
-          }, 300000);
+          }
         }
-        break;
+        
+        socket.to(roomId).emit("playerLeft", { playerId: socket.id, players, playerCount, selectedTeams });
       }
     }
   });
