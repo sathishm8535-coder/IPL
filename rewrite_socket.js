@@ -7,8 +7,8 @@ let content = fs.readFileSync(filePath, 'utf8');
 const anchor = '// Multiplayer functionality (Firebase Realtime Database)';
 const parts = content.split(anchor);
 if (parts.length < 2) {
-    console.error("Firebase anchor not found!");
-    process.exit(1);
+  console.error("Firebase anchor not found!");
+  process.exit(1);
 }
 
 // STRIP OUT FIREBASE IN TOP HALF IF ANY DUMMY CODE EXISTS
@@ -42,9 +42,9 @@ function initializeSocket() {
 
   // Detect local vs production
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  // Fallback to local 3000 if opened directly from file system
+  // Fallback to local 4000 if opened directly from file system
   const isFile = window.location.protocol === 'file:';
-  const serverUrl = (isLocal || isFile) ? 'http://localhost:3000' : 'https://ipl-cca1.onrender.com';
+  const serverUrl = (isLocal || isFile) ? 'http://localhost:4000' : 'https://ipl-cca1.onrender.com';
 
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
