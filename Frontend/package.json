@@ -1,0 +1,15 @@
+{
+  "name": "ipl-auction-frontend",
+  "version": "1.0.0",
+  "description": "IPL Auction Frontend",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx live-server --port=3000",
+    "debug": "node simple-server.js"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  }
+}
