@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ipl-auction-v4';
+const CACHE_NAME = 'ipl-auction-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -22,22 +22,26 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   // Skip Socket.IO and external requests
-  if (event.request.url.includes('socket.io') || 
-      event.request.url.includes('cdn.') ||
-      !event.request.url.startsWith(self.location.origin)) {
+  if (event.request.url.includes('socket.io') ||
+    event.request.url.includes('cdn.') ||
+    !event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        if (response) return response;
-        
-        // Clone the request
-        const fetchRequest = event.request.clone();
-        
-        return fetch(fetchRequest).catch(() => {
-          // Return offline page or cached version
+        // Update cache dynamically
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+        }
+        return response;
+      })
+      .catch(() => {
+        // Network failed, fallback to cache
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
           return caches.match('/index.html');
         });
       })

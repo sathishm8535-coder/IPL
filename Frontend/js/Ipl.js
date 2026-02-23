@@ -8,7 +8,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat1.jpg",
+    pic: "assests/bat1.jpg",
   },
 
   {
@@ -18,7 +18,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat2.jpg",
+    pic: "assests/bat2.jpg",
   },
 
   {
@@ -28,7 +28,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat3.jpg",
+    pic: "assests/bat3.jpg",
   },
   {
     name: "ROHIT SHARMA",
@@ -37,7 +37,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat4.jpg",
+    pic: "assests/bat4.jpg",
   },
   {
     name: "SHREYAS IYER",
@@ -46,7 +46,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat5.jpg",
+    pic: "assests/bat5.jpg",
   },
   {
     name: "SHUBMAN GILL",
@@ -55,7 +55,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bat6.jpg",
+    pic: "assests/bat6.jpg",
   },
   {
     name: "YASHASVI JAISWAL",
@@ -64,7 +64,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bat7.jpg",
+    pic: "assests/bat7.jpg",
   },
   {
     name: "RINKU SINGH",
@@ -73,7 +73,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bat9.jpg",
+    pic: "assests/bat9.jpg",
   },
   {
     name: "AMBATI RAYUDU",
@@ -82,7 +82,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat13.jpg",
+    pic: "assests/bat13.jpg",
   },
   {
     name: "SURESH RAINA",
@@ -91,7 +91,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat14.jpg",
+    pic: "assests/bat14.jpg",
   },
   {
     name: "YUVRAJ SINGH",
@@ -100,7 +100,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat15.jpg",
+    pic: "assests/bat15.jpg",
   },
   {
     name: "SHIKAR DHAWAN",
@@ -109,7 +109,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bat19.jpg",
+    pic: "assests/bat19.jpg",
   },
   {
     name: "RUTRAJ GAIKWAD",
@@ -118,7 +118,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bat22.jpg",
+    pic: "assests/bat22.jpg",
   },
 
   {
@@ -128,7 +128,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bat8.jpg",
+    pic: "assests/bat8.jpg",
   },
   {
     name: "TRAVIS HEAD",
@@ -137,7 +137,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat10.jpg",
+    pic: "assests/bat10.jpg",
   },
   {
     name: "FAF DU PLESSIS",
@@ -146,7 +146,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat11.jpg",
+    pic: "assests/bat11.jpg",
   },
   {
     name: "DAVID MILLER",
@@ -155,7 +155,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat12.jpg",
+    pic: "assests/bat12.jpg",
   },
   {
     name: "JAKE FRASER-MCGURK",
@@ -164,7 +164,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bat16.jpg",
+    pic: "assests/bat16.jpg",
   },
   {
     name: "DAVID WARNER",
@@ -173,7 +173,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat17.jpg",
+    pic: "assests/bat17.jpg",
   },
   {
     name: "CHRIS GAYLE",
@@ -182,7 +182,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat18.jpg",
+    pic: "assests/bat18.jpg",
   },
   {
     name: "KANE WILLAMSON",
@@ -191,7 +191,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bat20.jpg",
+    pic: "assests/bat20.jpg",
   },
   {
     name: "HARRY BROOK",
@@ -200,7 +200,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bat21.jpg",
+    pic: "assests/bat21.jpg",
   },
 
   {
@@ -210,7 +210,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat23.jpg",
+    pic: "assests/bat23.jpg",
   },
   {
     name: "MAYANK AGARWAL",
@@ -219,7 +219,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat24.jpg",
+    pic: "assests/bat24.jpg",
   },
   {
     name: "AYUSH MHATRE",
@@ -228,7 +228,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat25.jpg",
+    pic: "assests/bat25.jpg",
   },
   {
     name: "URVIL PATEL",
@@ -237,7 +237,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat27.jpg",
+    pic: "assests/bat27.jpg",
   },
   {
     name: "NAMAN DHIR",
@@ -246,7 +246,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat28.jpg",
+    pic: "assests/bat28.jpg",
   },
   {
     name: "TILAK VARMA",
@@ -255,7 +255,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat29.jpg",
+    pic: "assests/bat29.jpg",
   },
   {
     name: "PRIYANSH ARYA",
@@ -264,7 +264,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat30.jpg",
+    pic: "assests/bat30.jpg",
   },
   {
     name: "SHASHANK SINGH",
@@ -273,7 +273,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat31.jpg",
+    pic: "assests/bat31.jpg",
   },
   {
     name: "SAMEER RIZVI",
@@ -282,7 +282,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat32.jpg",
+    pic: "assests/bat32.jpg",
   },
   {
     name: "ASHUTOSH SHARMA",
@@ -291,7 +291,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat33.jpg",
+    pic: "assests/bat33.jpg",
   },
   {
     name: "KARUN NAIR",
@@ -300,7 +300,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat34.jpg",
+    pic: "assests/bat34.jpg",
   },
   {
     name: "SAI SUDHARSAN",
@@ -309,7 +309,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat35.jpg",
+    pic: "assests/bat35.jpg",
   },
   {
     name: "SHAHRUKH KHAN",
@@ -318,7 +318,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat36.jpg",
+    pic: "assests/bat36.jpg",
   },
   {
     name: "VAIBHAV SURYAVANSHI",
@@ -327,7 +327,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat38.jpg",
+    pic: "assests/bat38.jpg",
   },
   {
     name: "AJINKYA RAHANAE",
@@ -336,7 +336,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat39.jpg",
+    pic: "assests/bat39.jpg",
   },
   {
     name: "RAMANDEEP SINGH",
@@ -345,7 +345,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat40.jpg",
+    pic: "assests/bat40.jpg",
   },
   {
     name: "MANISH PANDEY",
@@ -354,7 +354,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat41.jpg",
+    pic: "assests/bat41.jpg",
   },
   {
     name: "ANGKRISH RAGHUVANSI",
@@ -363,7 +363,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat43.jpg",
+    pic: "assests/bat43.jpg",
   },
   {
     name: "AYSH BADONI",
@@ -372,7 +372,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat44.jpg",
+    pic: "assests/bat44.jpg",
   },
   {
     name: "ANIKET VERMA",
@@ -381,7 +381,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat46.jpg",
+    pic: "assests/bat46.jpg",
   },
   {
     name: "RAHUL TRIPATHI",
@@ -390,7 +390,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat47.jpg",
+    pic: "assests/bat47.jpg",
   },
   {
     name: "ABHINAV MANOHAR",
@@ -399,7 +399,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat51.jpg",
+    pic: "assests/bat51.jpg",
   },
   {
     name: "SACHIN BABY",
@@ -408,7 +408,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat52.jpg",
+    pic: "assests/bat52.jpg",
   },
   {
     name: "GAUTAM GAMBHIR",
@@ -417,7 +417,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat54.jpg",
+    pic: "assests/bat54.jpg",
   },
   {
     name: "SARFARAZ KHAN",
@@ -426,7 +426,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat56.jpg",
+    pic: "assests/bat56.jpg",
   },
   {
     name: "PRITHVI SHAW",
@@ -435,7 +435,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat57.jpg",
+    pic: "assests/bat57.jpg",
   },
   {
     name: "MANDEEP SINGH",
@@ -444,7 +444,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat58.jpg",
+    pic: "assests/bat58.jpg",
   },
   {
     name: "NITISH RANA",
@@ -453,7 +453,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bat65.jpg",
+    pic: "assests/bat65.jpg",
   },
   {
     name: "KEDAR JADAV",
@@ -462,7 +462,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat66.jpg",
+    pic: "assests/bat66.jpg",
   },
   {
     name: "MANAN VOHRA",
@@ -471,7 +471,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat68.jpg",
+    pic: "assests/bat68.jpg",
   },
   {
     name: "SHUBHAM DUBEY",
@@ -480,7 +480,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bat70.jpg",
+    pic: "assests/bat70.jpg",
   },
 
   {
@@ -490,7 +490,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bat26.jpg",
+    pic: "assests/bat26.jpg",
   },
   {
     name: "LHUAN-DRE PRETORIUS ",
@@ -499,7 +499,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat37.jpg",
+    pic: "assests/bat37.jpg",
   },
   {
     name: "ROVMAN POWELL",
@@ -508,7 +508,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat42.jpg",
+    pic: "assests/bat42.jpg",
   },
   {
     name: "MATTHEW BREETZKE",
@@ -517,7 +517,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat45.jpg",
+    pic: "assests/bat45.jpg",
   },
   {
     name: "BEVON JACOBS",
@@ -526,7 +526,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat48.jpg",
+    pic: "assests/bat48.jpg",
   },
   {
     name: "DONOVAN FERREIRA",
@@ -535,7 +535,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat49.jpg",
+    pic: "assests/bat49.jpg",
   },
   {
     name: "KARIM JANAT",
@@ -544,7 +544,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat50.jpg",
+    pic: "assests/bat50.jpg",
   },
   {
     name: "CHRIS LYNN",
@@ -553,7 +553,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat53.jpg",
+    pic: "assests/bat53.jpg",
   },
   {
     name: "STIVE SMITH",
@@ -562,7 +562,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat55.jpg",
+    pic: "assests/bat55.jpg",
   },
   {
     name: "MATTHEW WILLIAM SHORT",
@@ -571,7 +571,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat59.jpg",
+    pic: "assests/bat59.jpg",
   },
   {
     name: "RILEE ROSSOUW",
@@ -580,7 +580,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat60.jpg",
+    pic: "assests/bat60.jpg",
   },
   {
     name: "RASSIE VAN DER DUSSEN",
@@ -589,7 +589,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat61.jpg",
+    pic: "assests/bat61.jpg",
   },
   {
     name: "JOE ROOT",
@@ -598,7 +598,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat62.jpg",
+    pic: "assests/bat62.jpg",
   },
   {
     name: "AARON FINCH",
@@ -607,7 +607,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat63.jpg",
+    pic: "assests/bat63.jpg",
   },
   {
     name: "JASON ROY",
@@ -616,7 +616,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat64.jpg",
+    pic: "assests/bat64.jpg",
   },
   {
     name: "EVIN LEWIS",
@@ -625,7 +625,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bat67.jpg",
+    pic: "assests/bat67.jpg",
   },
   {
     name: "KYLE MAYERS",
@@ -634,7 +634,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bat69.jpg",
+    pic: "assests/bat69.jpg",
   },
 
   {
@@ -644,7 +644,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bowl1.jpg",
+    pic: "assests/bowl1.jpg",
   },
   {
     name: "JASPRIT BUMRAH",
@@ -653,7 +653,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl11.jpg",
+    pic: "assests/bowl11.jpg",
   },
   {
     name: "DEEPAK CHAHAR",
@@ -662,7 +662,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl13.jpg",
+    pic: "assests/bowl13.jpg",
   },
   {
     name: "ARSHDEEP SINGH",
@@ -671,7 +671,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl18.jpg",
+    pic: "assests/bowl18.jpg",
   },
   {
     name: "MUKESH KUMAR",
@@ -680,7 +680,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bowl19.jpg",
+    pic: "assests/bowl19.jpg",
   },
   {
     name: "T.NATARAJAN",
@@ -689,7 +689,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bowl21.jpg",
+    pic: "assests/bowl21.jpg",
   },
   {
     name: "ISHANT SHARMA",
@@ -698,7 +698,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl23.jpg",
+    pic: "assests/bowl23.jpg",
   },
   {
     name: "PRASIDH KRISHNA",
@@ -707,7 +707,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/bowl24.jpg",
+    pic: "assests/bowl24.jpg",
   },
   {
     name: "MOHAMMED SIRAJ",
@@ -716,7 +716,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl26.jpg",
+    pic: "assests/bowl26.jpg",
   },
   {
     name: "HARSHAL PATEL",
@@ -725,7 +725,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl41.jpg",
+    pic: "assests/bowl41.jpg",
   },
   {
     name: "BHUVNESHWAR KUMAR",
@@ -734,7 +734,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl42.jpg",
+    pic: "assests/bowl42.jpg",
   },
   {
     name: "MOHAMMAD SHAMI",
@@ -743,7 +743,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/bowl61.jpg",
+    pic: "assests/bowl61.jpg",
   },
 
   {
@@ -753,7 +753,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bowl3.jpg",
+    pic: "assests/bowl3.jpg",
   },
   {
     name: "JOSH HAZLEWOOD",
@@ -762,7 +762,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl5.jpg",
+    pic: "assests/bowl5.jpg",
   },
 
   {
@@ -772,7 +772,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl14.jpg",
+    pic: "assests/bowl14.jpg",
   },
   {
     name: "MITCHELL STARC",
@@ -781,7 +781,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl22.jpg",
+    pic: "assests/bowl22.jpg",
   },
   {
     name: "KAGISO RABADA",
@@ -790,7 +790,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl25.jpg",
+    pic: "assests/bowl25.jpg",
   },
   {
     name: "JOFRA ARCHER",
@@ -799,7 +799,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl32.jpg",
+    pic: "assests/bowl32.jpg",
   },
   {
     name: "MATHEESHA PATHIRANA",
@@ -808,7 +808,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bowl43.jpg",
+    pic: "assests/bowl43.jpg",
   },
   {
     name: "LASITH MALINGA",
@@ -817,7 +817,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl64.jpg",
+    pic: "assests/bowl64.jpg",
   },
   {
     name: "LOCKIE FERGUSON",
@@ -826,7 +826,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/bowl77.jpg",
+    pic: "assests/bowl77.jpg",
   },
   {
     name: "MARK WOOD",
@@ -835,7 +835,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/bowl79.jpg",
+    pic: "assests/bowl79.jpg",
   },
 
   {
@@ -845,7 +845,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl2.jpg",
+    pic: "assests/bowl2.jpg",
   },
   {
     name: "GURJAPNEET SINGH",
@@ -854,7 +854,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl6.jpg",
+    pic: "assests/bowl6.jpg",
   },
   {
     name: "MUKESH CHOUDHARY",
@@ -863,7 +863,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl8.jpg",
+    pic: "assests/bowl8.jpg",
   },
   {
     name: "KHALEEL AHMED",
@@ -872,7 +872,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl9.jpg",
+    pic: "assests/bowl9.jpg",
   },
   {
     name: "ANSHUL KAMBOJ",
@@ -881,7 +881,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl10.jpg",
+    pic: "assests/bowl10.jpg",
   },
   {
     name: "ASHWANI KUMAR",
@@ -890,7 +890,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl12.jpg",
+    pic: "assests/bowl12.jpg",
   },
   {
     name: "YASH THAKUR",
@@ -899,7 +899,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl16.jpg",
+    pic: "assests/bowl16.jpg",
   },
   {
     name: "VYSHAK VIJAYKUMAR",
@@ -908,7 +908,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl17.jpg",
+    pic: "assests/bowl17.jpg",
   },
   {
     name: "MOHD.ARSHAD KHAN",
@@ -917,7 +917,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl27.jpg",
+    pic: "assests/bowl27.jpg",
   },
   {
     name: "SANDEEP SHARMA",
@@ -926,7 +926,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl29.jpg",
+    pic: "assests/bowl29.jpg",
   },
   {
     name: "TUSHAR DESHPANDE",
@@ -935,7 +935,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl31.jpg",
+    pic: "assests/bowl31.jpg",
   },
   {
     name: "HARSHIT RANA",
@@ -944,7 +944,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl33.jpg",
+    pic: "assests/bowl33.jpg",
   },
   {
     name: "VAIBHAV ARORA",
@@ -953,7 +953,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl34.jpg",
+    pic: "assests/bowl34.jpg",
   },
   {
     name: "MOHSIN KHAN",
@@ -962,7 +962,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl35.jpg",
+    pic: "assests/bowl35.jpg",
   },
   {
     name: "MAYANK YADAV",
@@ -971,7 +971,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl36.jpg",
+    pic: "assests/bowl36.jpg",
   },
   {
     name: "AKASH SINGH",
@@ -980,7 +980,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl37.jpg",
+    pic: "assests/bowl37.jpg",
   },
   {
     name: "AVESH KHAN",
@@ -989,7 +989,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl38.jpg",
+    pic: "assests/bowl38.jpg",
   },
   {
     name: "JAYDEV UNADKAT",
@@ -998,7 +998,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl40.jpg",
+    pic: "assests/bowl40.jpg",
   },
   {
     name: "KAMLESH NAGARKOTI",
@@ -1007,7 +1007,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl44.jpg",
+    pic: "assests/bowl44.jpg",
   },
   {
     name: "ARJUN TENDULKAR",
@@ -1016,7 +1016,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl46.jpg",
+    pic: "assests/bowl46.jpg",
   },
   {
     name: "MOHIT SHARMA",
@@ -1025,7 +1025,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl49.jpg",
+    pic: "assests/bowl49.jpg",
   },
   {
     name: "KULDEEP SEN",
@@ -1034,7 +1034,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl50.jpg",
+    pic: "assests/bowl50.jpg",
   },
   {
     name: "AKASH MADHWAL",
@@ -1043,7 +1043,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl52.jpg",
+    pic: "assests/bowl52.jpg",
   },
   {
     name: "CHETAN SAKARIYA",
@@ -1052,7 +1052,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl54.jpg",
+    pic: "assests/bowl54.jpg",
   },
   {
     name: "AKASH DEEP",
@@ -1061,7 +1061,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl59.jpg",
+    pic: "assests/bowl59.jpg",
   },
   {
     name: "SIMARJEET SINGH",
@@ -1070,7 +1070,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl60.jpg",
+    pic: "assests/bowl60.jpg",
   },
   {
     name: "SHIVAM MAVI",
@@ -1079,7 +1079,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl70.jpg",
+    pic: "assests/bowl70.jpg",
   },
   {
     name: "UMESH YADAV",
@@ -1088,7 +1088,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl72.jpg",
+    pic: "assests/bowl72.jpg",
   },
   {
     name: "NAVDEEP SAINI",
@@ -1097,7 +1097,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl73.jpg",
+    pic: "assests/bowl73.jpg",
   },
   {
     name: "SIDHARTH KAUL",
@@ -1106,7 +1106,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/bowl75.jpg",
+    pic: "assests/bowl75.jpg",
   },
   {
     name: "UMRAN MALIK",
@@ -1115,7 +1115,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/bowl82.jpg",
+    pic: "assests/bowl82.jpg",
   },
 
   {
@@ -1125,7 +1125,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bowl4.jpg",
+    pic: "assests/bowl4.jpg",
   },
   {
     name: "NATHAN ELLIS",
@@ -1134,7 +1134,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl7.jpg",
+    pic: "assests/bowl7.jpg",
   },
   {
     name: "XAVIER BARTLETT",
@@ -1143,7 +1143,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl15.jpg",
+    pic: "assests/bowl15.jpg",
   },
   {
     name: "DUSHMANTHA CHAMEERA",
@@ -1152,7 +1152,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl20.jpg",
+    pic: "assests/bowl20.jpg",
   },
   {
     name: "NANDRE BURGER",
@@ -1161,7 +1161,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl28.jpg",
+    pic: "assests/bowl28.jpg",
   },
   {
     name: "KWENA MAPHAKA",
@@ -1170,7 +1170,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl30.jpg",
+    pic: "assests/bowl30.jpg",
   },
   {
     name: "ESHAN MALINGA",
@@ -1179,7 +1179,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl39.jpg",
+    pic: "assests/bowl39.jpg",
   },
   {
     name: "RICHARD GLEESON",
@@ -1188,7 +1188,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl45.jpg",
+    pic: "assests/bowl45.jpg",
   },
   {
     name: "REECE TOPLEY",
@@ -1197,7 +1197,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bowl47.jpg",
+    pic: "assests/bowl47.jpg",
   },
   {
     name: "MUSTAFIZUR RAHMAN",
@@ -1206,7 +1206,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl48.jpg",
+    pic: "assests/bowl48.jpg",
   },
   {
     name: "GERALD COETZEE",
@@ -1215,7 +1215,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bowl51.jpg",
+    pic: "assests/bowl51.jpg",
   },
   {
     name: "FAZALHOQ FAROOQI",
@@ -1224,7 +1224,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl53.jpg",
+    pic: "assests/bowl53.jpg",
   },
   {
     name: "ANRICH NORTJE",
@@ -1233,7 +1233,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bowl55.jpg",
+    pic: "assests/bowl55.jpg",
   },
   {
     name: "SPENCER JOHNSON",
@@ -1242,7 +1242,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl56.jpg",
+    pic: "assests/bowl56.jpg",
   },
   {
     name: "WILLIAM O'ROURKE",
@@ -1251,7 +1251,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl57.jpg",
+    pic: "assests/bowl57.jpg",
   },
   {
     name: "SHAMAR JOSEPH",
@@ -1260,7 +1260,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl58.jpg",
+    pic: "assests/bowl58.jpg",
   },
   {
     name: "CRIS JORDAN",
@@ -1269,7 +1269,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl62.jpg",
+    pic: "assests/bowl62.jpg",
   },
   {
     name: "ADAM MILNE",
@@ -1278,7 +1278,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl63.jpg",
+    pic: "assests/bowl63.jpg",
   },
   {
     name: "RILEY MEREDITH",
@@ -1287,7 +1287,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl65.jpg",
+    pic: "assests/bowl65.jpg",
   },
   {
     name: "TYMAL MILLS",
@@ -1296,7 +1296,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl66.jpg",
+    pic: "assests/bowl66.jpg",
   },
   {
     name: "JASON BEHRENDORFF",
@@ -1305,7 +1305,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl67.jpg",
+    pic: "assests/bowl67.jpg",
   },
   {
     name: "JHYE RICHARDSON",
@@ -1314,7 +1314,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl68.jpg",
+    pic: "assests/bowl68.jpg",
   },
   {
     name: "JOSH LITTLE",
@@ -1323,7 +1323,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl71.jpg",
+    pic: "assests/bowl71.jpg",
   },
   {
     name: "TIM SOUTHEE",
@@ -1332,7 +1332,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl74.jpg",
+    pic: "assests/bowl74.jpg",
   },
   {
     name: "DAVID WILLEY",
@@ -1341,7 +1341,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl76.jpg",
+    pic: "assests/bowl76.jpg",
   },
   {
     name: "ALZARRI JOSEPH",
@@ -1350,7 +1350,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/bowl78.jpg",
+    pic: "assests/bowl78.jpg",
   },
 
   {
@@ -1360,7 +1360,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl80.jpg",
+    pic: "assests/bowl80.jpg",
   },
   {
     name: "MATT HENRY",
@@ -1369,7 +1369,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/bowl81.jpg",
+    pic: "assests/bowl81.jpg",
   },
 
   {
@@ -1379,7 +1379,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all1.jpg",
+    pic: "assests/all1.jpg",
   },
   {
     name: "SHIVAM DUBE",
@@ -1388,7 +1388,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all2.jpg",
+    pic: "assests/all2.jpg",
   },
   {
     name: "HARDIK PANDYA",
@@ -1397,7 +1397,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all3.jpg",
+    pic: "assests/all3.jpg",
   },
   {
     name: "AXAR PATEL",
@@ -1406,7 +1406,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all4.jpg",
+    pic: "assests/all4.jpg",
   },
   {
     name: "WASHINGTON SUNDAR",
@@ -1415,7 +1415,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all5.jpg",
+    pic: "assests/all5.jpg",
   },
   {
     name: "ABHISHEK SHARMA",
@@ -1424,7 +1424,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all6.jpg",
+    pic: "assests/all6.jpg",
   },
   {
     name: "RAVINDRA JADEJA",
@@ -1433,7 +1433,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all7.jpg",
+    pic: "assests/all7.jpg",
   },
   {
     name: "RAVICHANDRAN ASHWIN",
@@ -1442,7 +1442,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/all8.jpg",
+    pic: "assests/all8.jpg",
   },
   {
     name: "VENKATESH IYER",
@@ -1451,7 +1451,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 8,
-    pic: "../assests/all9.jpg",
+    pic: "assests/all9.jpg",
   },
 
   {
@@ -1461,7 +1461,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all10.jpg",
+    pic: "assests/all10.jpg",
   },
   {
     name: "ROMARIO SHEPHERD",
@@ -1470,7 +1470,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all11.jpg",
+    pic: "assests/all11.jpg",
   },
   {
     name: "LIAM LIVINGSTONE",
@@ -1479,7 +1479,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all12.jpg",
+    pic: "assests/all12.jpg",
   },
   {
     name: "MARCO JANSEN",
@@ -1488,7 +1488,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all13.jpg",
+    pic: "assests/all13.jpg",
   },
   {
     name: "MARCUS STOINIS",
@@ -1497,7 +1497,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all14.jpg",
+    pic: "assests/all14.jpg",
   },
   {
     name: "SUNIL NARINE",
@@ -1506,7 +1506,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all15.jpg",
+    pic: "assests/all15.jpg",
   },
   {
     name: "MITCHELL MARSH",
@@ -1515,7 +1515,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all16.jpg",
+    pic: "assests/all16.jpg",
   },
   {
     name: "PAT CUMMINS",
@@ -1524,7 +1524,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all17.jpg",
+    pic: "assests/all17.jpg",
   },
   {
     name: "WANINDU HASARANGA",
@@ -1533,7 +1533,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/all18.jpg",
+    pic: "assests/all18.jpg",
   },
   {
     name: "ANDRE RUSSELL",
@@ -1542,7 +1542,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all19.jpg",
+    pic: "assests/all19.jpg",
   },
   {
     name: "SHANE WATSON",
@@ -1551,7 +1551,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all20.jpg",
+    pic: "assests/all20.jpg",
   },
   {
     name: "DWAYNE BRAVO",
@@ -1560,7 +1560,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all21.jpg",
+    pic: "assests/all21.jpg",
   },
   {
     name: "BEN STOKES",
@@ -1569,7 +1569,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all22.jpg",
+    pic: "assests/all22.jpg",
   },
   {
     name: "KIERON POLLARD",
@@ -1578,7 +1578,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all23.jpg",
+    pic: "assests/all23.jpg",
   },
   {
     name: "CAMERON GREEN",
@@ -1587,7 +1587,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all24.jpg",
+    pic: "assests/all24.jpg",
   },
   {
     name: "GLENN MAXWELL",
@@ -1596,7 +1596,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/all25.jpg",
+    pic: "assests/all25.jpg",
   },
   {
     name: "JACOB BETHELL",
@@ -1605,7 +1605,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/all26.jpg",
+    pic: "assests/all26.jpg",
   },
   {
     name: "WILL JACKS",
@@ -1614,7 +1614,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/all27.jpg",
+    pic: "assests/all27.jpg",
   },
 
   {
@@ -1624,7 +1624,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all28.jpg",
+    pic: "assests/all28.jpg",
   },
   {
     name: "HARPREET BRAR",
@@ -1633,7 +1633,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all29.jpg",
+    pic: "assests/all29.jpg",
   },
   {
     name: "NEHAL WADHERA",
@@ -1642,7 +1642,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all30.jpg",
+    pic: "assests/all30.jpg",
   },
   {
     name: "VIPRAJ NIGAM",
@@ -1651,7 +1651,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all31.jpg",
+    pic: "assests/all31.jpg",
   },
   {
     name: "RAHUL TEWATIA",
@@ -1660,7 +1660,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all32.jpg",
+    pic: "assests/all32.jpg",
   },
   {
     name: "JAYANT YADAV",
@@ -1669,7 +1669,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all33.jpg",
+    pic: "assests/all33.jpg",
   },
   {
     name: "ANUKUL ROY",
@@ -1678,7 +1678,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all34.jpg",
+    pic: "assests/all34.jpg",
   },
   {
     name: "SHAHBAZ AHMED",
@@ -1687,7 +1687,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all35.jpg",
+    pic: "assests/all35.jpg",
   },
   {
     name: "ABDUL SAMAD",
@@ -1696,7 +1696,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all36.jpg",
+    pic: "assests/all36.jpg",
   },
   {
     name: "NITHISH KUMAR REDDY",
@@ -1705,7 +1705,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all37.jpg",
+    pic: "assests/all37.jpg",
   },
   {
     name: "DEEPAK HOODA",
@@ -1714,7 +1714,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all38.jpg",
+    pic: "assests/all38.jpg",
   },
   {
     name: "VIJAY SHANKAR",
@@ -1723,7 +1723,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all39.jpg",
+    pic: "assests/all39.jpg",
   },
   {
     name: "MAHIPAL LOMROR",
@@ -1732,7 +1732,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all40.jpg",
+    pic: "assests/all40.jpg",
   },
   {
     name: "SHARDUL THAKUR",
@@ -1741,7 +1741,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/all41.jpg",
+    pic: "assests/all41.jpg",
   },
   {
     name: "RAJVARDHAN HANGARGEKAR",
@@ -1750,7 +1750,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/all42.jpg",
+    pic: "assests/all42.jpg",
   },
 
   {
@@ -1760,7 +1760,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all43.jpg",
+    pic: "assests/all43.jpg",
   },
   {
     name: "MITCHELL SANTNER",
@@ -1769,7 +1769,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 8,
-    pic: "../assests/all44.jpg",
+    pic: "assests/all44.jpg",
   },
   {
     name: "AZMATULLAH OMARZAI",
@@ -1778,7 +1778,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all45.jpg",
+    pic: "assests/all45.jpg",
   },
   {
     name: "AIDEN MARKRAM",
@@ -1787,7 +1787,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 8,
-    pic: "../assests/all46.jpg",
+    pic: "assests/all46.jpg",
   },
   {
     name: "KUSAL MENDIS",
@@ -1796,7 +1796,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all47.jpg",
+    pic: "assests/all47.jpg",
   },
   {
     name: "SAM CURRAN",
@@ -1805,7 +1805,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all48.jpg",
+    pic: "assests/all48.jpg",
   },
   {
     name: "RACHIN RAVINDRA",
@@ -1814,7 +1814,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all49.jpg",
+    pic: "assests/all49.jpg",
   },
   {
     name: "CHARITH ASALANKA",
@@ -1823,7 +1823,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all50.jpg",
+    pic: "assests/all50.jpg",
   },
   {
     name: "KYLE JAMIESON",
@@ -1832,7 +1832,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all51.jpg",
+    pic: "assests/all51.jpg",
   },
   {
     name: "DASUN SHANAKA",
@@ -1841,7 +1841,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all52.jpg",
+    pic: "assests/all52.jpg",
   },
   {
     name: "SHERFANE RUTHERFORD",
@@ -1850,7 +1850,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all53.jpg",
+    pic: "assests/all53.jpg",
   },
   {
     name: "MOEEN ALI",
@@ -1859,7 +1859,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all54.jpg",
+    pic: "assests/all54.jpg",
   },
   {
     name: "WIAAN MULDER",
@@ -1868,7 +1868,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all55.jpg",
+    pic: "assests/all55.jpg",
   },
   {
     name: "DWAINE PRETORIUS",
@@ -1877,7 +1877,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all56.jpg",
+    pic: "assests/all56.jpg",
   },
   {
     name: "DARYL MITCHELL",
@@ -1886,7 +1886,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all57.jpg",
+    pic: "assests/all57.jpg",
   },
   {
     name: "JAMES NEESHAM",
@@ -1895,7 +1895,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all58.jpg",
+    pic: "assests/all58.jpg",
   },
   {
     name: "FABIAN ALLEN",
@@ -1904,7 +1904,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all59.jpg",
+    pic: "assests/all59.jpg",
   },
   {
     name: "DANIEL SAMS",
@@ -1913,7 +1913,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all60.jpg",
+    pic: "assests/all60.jpg",
   },
   {
     name: "MOHAMMAD NABI",
@@ -1922,7 +1922,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all61.jpg",
+    pic: "assests/all61.jpg",
   },
   {
     name: "MOISES HENRIQUES",
@@ -1931,7 +1931,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all62.jpg",
+    pic: "assests/all62.jpg",
   },
   {
     name: "ODEAN SMITH",
@@ -1940,7 +1940,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all63.jpg",
+    pic: "assests/all63.jpg",
   },
   {
     name: "SIKANDAR RAZA",
@@ -1949,7 +1949,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all64.jpg",
+    pic: "assests/all64.jpg",
   },
   {
     name: "CHRIS WOAKES",
@@ -1958,7 +1958,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all65.jpg",
+    pic: "assests/all65.jpg",
   },
   {
     name: "NATHAN COULTER-NILE",
@@ -1967,7 +1967,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all66.jpg",
+    pic: "assests/all66.jpg",
   },
   {
     name: "JASON HOLDER",
@@ -1976,7 +1976,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all67.jpg",
+    pic: "assests/all67.jpg",
   },
   {
     name: "SHAKIB AL HASAN",
@@ -1985,7 +1985,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/all68.jpg",
+    pic: "assests/all68.jpg",
   },
   {
     name: "MICHAEL BRACEWELL",
@@ -1994,7 +1994,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all69.jpg",
+    pic: "assests/all69.jpg",
   },
   {
     name: "TOM CURRAN",
@@ -2003,7 +2003,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/all70.jpg",
+    pic: "assests/all70.jpg",
   },
 
   {
@@ -2013,7 +2013,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk1.jpg",
+    pic: "assests/wk1.jpg",
   },
   {
     name: "KL RAHUL",
@@ -2022,7 +2022,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk2.jpg",
+    pic: "assests/wk2.jpg",
   },
   {
     name: "RISHABH PANT",
@@ -2031,7 +2031,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk3.jpg",
+    pic: "assests/wk3.jpg",
   },
   {
     name: "ISHAN KISHAN",
@@ -2040,7 +2040,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk4.jpg",
+    pic: "assests/wk4.jpg",
   },
   {
     name: "SANJU SAMSON",
@@ -2049,7 +2049,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk5.jpg",
+    pic: "assests/wk5.jpg",
   },
   {
     name: "DINESH KARTHIK",
@@ -2058,7 +2058,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/wk6.jpg",
+    pic: "assests/wk6.jpg",
   },
 
   {
@@ -2068,7 +2068,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk7.jpg",
+    pic: "assests/wk7.jpg",
   },
   {
     name: "TRISTAN STUBBS",
@@ -2077,7 +2077,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk8.jpg",
+    pic: "assests/wk8.jpg",
   },
   {
     name: "JOS BUTTLER",
@@ -2086,7 +2086,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk9.jpg",
+    pic: "assests/wk9.jpg",
   },
   {
     name: "NICHOLAS POORAN",
@@ -2095,7 +2095,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk10.jpg",
+    pic: "assests/wk10.jpg",
   },
   {
     name: "HEINRICH KLAASEN",
@@ -2104,7 +2104,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk11.jpg",
+    pic: "assests/wk11.jpg",
   },
   {
     name: "AB DE VILLIERS",
@@ -2113,7 +2113,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/wk12.jpg",
+    pic: "assests/wk12.jpg",
   },
 
   {
@@ -2123,7 +2123,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 8,
-    pic: "../assests/wk13.jpg",
+    pic: "assests/wk13.jpg",
   },
   {
     name: "ROBIN MINZ",
@@ -2132,7 +2132,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk14.jpg",
+    pic: "assests/wk14.jpg",
   },
   {
     name: "PRABHSIMRAN SINGH",
@@ -2141,7 +2141,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 8,
-    pic: "../assests/wk15.jpg",
+    pic: "assests/wk15.jpg",
   },
   {
     name: "ABISHEK POREL",
@@ -2150,7 +2150,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk16.jpg",
+    pic: "assests/wk16.jpg",
   },
   {
     name: "ANUJ RAWAT",
@@ -2159,7 +2159,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk17.jpg",
+    pic: "assests/wk17.jpg",
   },
   {
     name: "KUMAR KUSHAGRA",
@@ -2168,7 +2168,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk18.jpg",
+    pic: "assests/wk18.jpg",
   },
   {
     name: "DHRUV JUREL",
@@ -2177,7 +2177,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 8,
-    pic: "../assests/wk19.jpg",
+    pic: "assests/wk19.jpg",
   },
   {
     name: "NARAYAN JAGADEESAN",
@@ -2186,7 +2186,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk20.jpg",
+    pic: "assests/wk20.jpg",
   },
   {
     name: "ROBIN UTHAPPA",
@@ -2195,7 +2195,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk21.jpg",
+    pic: "assests/wk21.jpg",
   },
   {
     name: "K.S BHARAT",
@@ -2204,7 +2204,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk22.jpg",
+    pic: "assests/wk22.jpg",
   },
   {
     name: "WRIDDHIMAN SAHA",
@@ -2213,7 +2213,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/wk23.jpg",
+    pic: "assests/wk23.jpg",
   },
   {
     name: "BABA INDRAJITH",
@@ -2222,7 +2222,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/wk24.jpg",
+    pic: "assests/wk24.jpg",
   },
 
   {
@@ -2232,7 +2232,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk25.jpg",
+    pic: "assests/wk25.jpg",
   },
   {
     name: "RYAN RICKELTON",
@@ -2241,7 +2241,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk26.jpg",
+    pic: "assests/wk26.jpg",
   },
   {
     name: "GLENN PHILLIPS",
@@ -2250,7 +2250,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk27.jpg",
+    pic: "assests/wk27.jpg",
   },
   {
     name: "DEVON CONWAY",
@@ -2259,7 +2259,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk28.jpg",
+    pic: "assests/wk28.jpg",
   },
   {
     name: "JONNY BAIRSTOW",
@@ -2268,7 +2268,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk29.jpg",
+    pic: "assests/wk29.jpg",
   },
   {
     name: "JOSH INGLIS",
@@ -2277,7 +2277,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 8,
-    pic: "../assests/wk30.jpg",
+    pic: "assests/wk30.jpg",
   },
   {
     name: "KUSAL MENDIS",
@@ -2286,7 +2286,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk31.jpg",
+    pic: "assests/wk31.jpg",
   },
   {
     name: "RAHMANULLAH GURBAZ",
@@ -2295,7 +2295,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk32.jpg",
+    pic: "assests/wk32.jpg",
   },
   {
     name: "QUINTON DE KOCK",
@@ -2304,7 +2304,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk33.jpg",
+    pic: "assests/wk33.jpg",
   },
   {
     name: "ALEX CAREY",
@@ -2313,7 +2313,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk34.jpg",
+    pic: "assests/wk34.jpg",
   },
   {
     name: "SAM BILLINGS",
@@ -2322,7 +2322,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk35.jpg",
+    pic: "assests/wk35.jpg",
   },
   {
     name: "SHAI HOPE",
@@ -2331,7 +2331,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk36.jpg",
+    pic: "assests/wk36.jpg",
   },
   {
     name: "BHANUKA RAJAPAKSA",
@@ -2340,7 +2340,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk37.jpg",
+    pic: "assests/wk37.jpg",
   },
   {
     name: "MATTHEW WADE",
@@ -2349,7 +2349,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/wk38.jpg",
+    pic: "assests/wk38.jpg",
   },
   {
     name: "TOM BANTON",
@@ -2358,7 +2358,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk39.jpg",
+    pic: "assests/wk39.jpg",
   },
   {
     name: "FINN ALLEN",
@@ -2367,7 +2367,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/wk40.jpg",
+    pic: "assests/wk40.jpg",
   },
 
   {
@@ -2377,7 +2377,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/spin1.jpg",
+    pic: "assests/spin1.jpg",
   },
   {
     name: "KULDEEP YADAV",
@@ -2386,7 +2386,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/spin2.jpg",
+    pic: "assests/spin2.jpg",
   },
   {
     name: "VARUN CHAKARAVARTHY",
@@ -2395,7 +2395,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/spin3.jpg",
+    pic: "assests/spin3.jpg",
   },
   {
     name: "RAVI BISHNOI",
@@ -2404,7 +2404,7 @@ const players = [
     basePrice: 2,
     foreign: false,
     points: 10,
-    pic: "../assests/spin4.jpg",
+    pic: "assests/spin4.jpg",
   },
 
   {
@@ -2414,7 +2414,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/spin5.jpg",
+    pic: "assests/spin5.jpg",
   },
   {
     name: "RASHID KHAN",
@@ -2423,7 +2423,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 10,
-    pic: "../assests/spin6.jpg",
+    pic: "assests/spin6.jpg",
   },
   {
     name: "MAHEESH THEEKSHANA",
@@ -2432,7 +2432,7 @@ const players = [
     basePrice: 2,
     foreign: true,
     points: 8,
-    pic: "../assests/spin7.jpg",
+    pic: "assests/spin7.jpg",
   },
 
   {
@@ -2442,7 +2442,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin8.jpg",
+    pic: "assests/spin8.jpg",
   },
   {
     name: "SHREYAS GOPAL",
@@ -2451,7 +2451,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin9.jpg",
+    pic: "assests/spin9.jpg",
   },
   {
     name: "PIYUSH CHAWLA",
@@ -2460,7 +2460,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin10.jpg",
+    pic: "assests/spin10.jpg",
   },
   {
     name: "SAI KISHORE",
@@ -2469,7 +2469,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin11.jpg",
+    pic: "assests/spin11.jpg",
   },
   {
     name: "DIGVESH RATHI",
@@ -2478,7 +2478,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin12.jpg",
+    pic: "assests/spin12.jpg",
   },
   {
     name: "SIDDHARTH MANIMARAN",
@@ -2487,7 +2487,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin13.jpg",
+    pic: "assests/spin13.jpg",
   },
   {
     name: "KARAN SHARMA",
@@ -2496,7 +2496,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin14.jpg",
+    pic: "assests/spin14.jpg",
   },
   {
     name: "PRAVEEN DUBEY",
@@ -2505,7 +2505,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin15.jpg",
+    pic: "assests/spin15.jpg",
   },
   {
     name: "KUMAR KARTIKEYA",
@@ -2514,7 +2514,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 4,
-    pic: "../assests/spin16.jpg",
+    pic: "assests/spin16.jpg",
   },
   {
     name: "MAYANK MARKANDE",
@@ -2523,7 +2523,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin17.jpg",
+    pic: "assests/spin17.jpg",
   },
   {
     name: "RAHUL CHAHAR",
@@ -2532,7 +2532,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin18.jpg",
+    pic: "assests/spin18.jpg",
   },
   {
     name: "MURUGAN ASHWIN",
@@ -2541,7 +2541,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin19.jpg",
+    pic: "assests/spin19.jpg",
   },
   {
     name: "AMIT MISHRA",
@@ -2550,7 +2550,7 @@ const players = [
     basePrice: 1,
     foreign: false,
     points: 6,
-    pic: "../assests/spin20.jpg",
+    pic: "assests/spin20.jpg",
   },
 
   {
@@ -2560,7 +2560,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/spin21.jpg",
+    pic: "assests/spin21.jpg",
   },
   {
     name: "IMRAN TAHIR",
@@ -2569,7 +2569,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/spin22.jpg",
+    pic: "assests/spin22.jpg",
   },
   {
     name: "ADIL RASHID",
@@ -2578,7 +2578,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: " ../assests/spin23.jpg",
+    pic: " assests/spin23.jpg",
   },
   {
     name: "TABRAIZ SHAMSI",
@@ -2587,7 +2587,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/spin24.jpg",
+    pic: "assests/spin24.jpg",
   },
 
   {
@@ -2597,7 +2597,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 6,
-    pic: "../assests/spin25.jpg",
+    pic: "assests/spin25.jpg",
   },
 
   {
@@ -2607,7 +2607,7 @@ const players = [
     basePrice: 1,
     foreign: true,
     points: 4,
-    pic: "../assests/spin26.jpg",
+    pic: "assests/spin26.jpg",
   },
 ];
 
@@ -2660,16 +2660,16 @@ const TEAM_SHORT_NAMES = {
 
 /* TEAM LOGOS */
 const TEAM_LOGOS = {
-  "Chennai Super Kings": "../assests/logo9.jpg",
-  "Mumbai Indians": "../assests/logo5.jpg",
-  "Royal Challengers Bengaluru": "../assests/logo2.jpg",
-  "Kolkata Knight Riders": "../assests/logo10.jpg",
-  "Rajasthan Royals": "../assests/logo3.jpg",
-  "Delhi Capitals": "../assests/logo7.jpg",
-  "Sunrisers Hyderabad": "../assests/logo1.jpg",
-  "Punjab Kings": "../assests/logo4.jpg",
-  "Gujarat Titans": "../assests/logo8.jpg",
-  "Lucknow Super Giants": "../assests/logo6.jpg",
+  "Chennai Super Kings": "assests/logo9.jpg",
+  "Mumbai Indians": "assests/logo5.jpg",
+  "Royal Challengers Bengaluru": "assests/logo2.jpg",
+  "Kolkata Knight Riders": "assests/logo10.jpg",
+  "Rajasthan Royals": "assests/logo3.jpg",
+  "Delhi Capitals": "assests/logo7.jpg",
+  "Sunrisers Hyderabad": "assests/logo1.jpg",
+  "Punjab Kings": "assests/logo4.jpg",
+  "Gujarat Titans": "assests/logo8.jpg",
+  "Lucknow Super Giants": "assests/logo6.jpg",
 };
 
 /* DOM refs */
@@ -2779,9 +2779,9 @@ function buildTeamRows(count) {
     // team change -> enforce uniqueness & show team logo only if no uploaded photo
     sel.addEventListener("change", () => {
       const selectedTeam = sel.value;
-      
+
       // In multiplayer mode, emit team selection to server
-      if (isMultiplayer && socket && socket.connected && currentRoomId && selectedTeam) {
+      if (false) {
         const friendName = document.getElementById(`friend-name-${i}`)?.value.trim() || `Friend ${i + 1}`;
         socket.emit('selectTeam', {
           roomId: currentRoomId,
@@ -2793,7 +2793,7 @@ function buildTeamRows(count) {
           }
         });
       }
-      
+
       updateTeamDropdowns();
 
       const preview = document.getElementById(`avatar-preview-${i}`);
@@ -2873,12 +2873,12 @@ setTimeout(updateTeamDropdowns, 40);
 function updateTeamDropdowns() {
   const selects = Array.from(document.querySelectorAll('[id^="team-select-"]'));
   const localSelected = selects.map((s) => s.value).filter((v) => v);
-  
+
   // In multiplayer mode, also consider teams selected by other players
-  const allSelected = isMultiplayer ? 
-    [...new Set([...localSelected, ...selectedTeamsInRoom])] : 
+  const allSelected = isMultiplayer ?
+    [...new Set([...localSelected, ...selectedTeamsInRoom])] :
     localSelected;
-  
+
   selects.forEach((s) => {
     const own = s.value;
     // recreate options
@@ -2893,13 +2893,13 @@ function updateTeamDropdowns() {
         const o = document.createElement("option");
         o.value = team;
         o.text = team;
-        
+
         // Mark teams selected by other players as disabled
         if (isMultiplayer && selectedTeamsInRoom.includes(team) && team !== own) {
           o.disabled = true;
           o.text += " (Selected by another player)";
         }
-        
+
         s.appendChild(o);
       }
     });
@@ -2953,7 +2953,7 @@ function startAuction() {
   }
 
   // Send auction start to all players if in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (false) {
     socket.emit('startAuction', {
       roomId: currentRoomId,
       teams: teams
@@ -2993,9 +2993,9 @@ function escapeHtml(s) {
   return s.replace(
     /[&<>"']/g,
     (m) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
-        m
-      ])
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+      m
+    ])
   );
 }
 
@@ -3057,8 +3057,7 @@ function bidNow(idx) {
   // validations
   if (t.budget < currentPrice + priceIncrement) {
     showNotification(
-      `${t.friendName} does not have enough budget (₹${
-        t.budget
+      `${t.friendName} does not have enough budget (₹${t.budget
       } Cr) for next bid (₹${currentPrice + priceIncrement} Cr)`,
       'error'
     );
@@ -3091,7 +3090,7 @@ function bidNow(idx) {
   startCountdownIfNeeded();
 
   // Send bid to other players if in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (false) {
     socket.emit('placeBid', {
       roomId: currentRoomId,
       bidAmount: currentPrice,
@@ -3161,7 +3160,7 @@ function assignPlayer(skipped = false) {
   }
 
   // Send player assignment in multiplayer mode BEFORE moving to next player
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (false) {
     socket.emit('playerAssigned', {
       roomId: currentRoomId,
       player: p,
@@ -3177,7 +3176,7 @@ function assignPlayer(skipped = false) {
   updateTeamsView();
 
   // Send next player event in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (false) {
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
       playerIndex: currentPlayerIndex
@@ -3214,15 +3213,15 @@ function skipCurrentPlayer() {
   }
   highestBidderIdx = -1;
   currentPlayerIndex++;
-  
+
   // Send next player event in multiplayer mode
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (false) {
     socket.emit('nextPlayer', {
       roomId: currentRoomId,
       playerIndex: currentPlayerIndex
     });
   }
-  
+
   updateTeamsView();
   if (currentPlayerIndex < players.length) {
     loadPlayer();
@@ -3230,7 +3229,7 @@ function skipCurrentPlayer() {
     showNotification("Auction completed for all players in the list.", 'success');
     highestBidderEl.textContent = "-";
     timerEl.textContent = "0s";
-    
+
     // Auto show final results when auction ends
     showResult();
     const showWinnerBtn = document.getElementById("showWinnerBtn");
@@ -3253,20 +3252,18 @@ function updateTeamsView() {
     div.className = "team-card";
     div.innerHTML = `
       <div class="team-left-display">
-        ${
-          t.avatarDataUrl
-            ? `<img src="${t.avatarDataUrl}" class="avatar-preview">`
-            : `<div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.02);display:inline-block"></div>`
-        }
+        ${t.avatarDataUrl
+        ? `<img src="${t.avatarDataUrl}" class="avatar-preview">`
+        : `<div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.02);display:inline-block"></div>`
+      }
         <div>
           <div style="font-weight:700">${escapeHtml(
-            t.friendName
-          )} <span style="color:var(--muted)">(${escapeHtml(
-      t.teamName
-    )})</span></div>
-          <div class="team-meta">Budget: ₹${t.budget} Cr • Players: ${
-      t.players.length
-    } • Foreign: ${t.foreignCount} • Points: ${t.totalPoints}</div>
+        t.friendName
+      )} <span style="color:var(--muted)">(${escapeHtml(
+        t.teamName
+      )})</span></div>
+          <div class="team-meta">Budget: ₹${t.budget} Cr • Players: ${t.players.length
+      } • Foreign: ${t.foreignCount} • Points: ${t.totalPoints}</div>
         </div>
       </div>
       <div style="text-align:right;font-size:13px;color:var(--muted)">${escapeHtml(
@@ -3341,7 +3338,7 @@ function filterPlayers() {
 function updatePaginationControls(totalItems, currentItems) {
   const totalPages = Math.ceil(totalItems / playersPerPage);
   let controlsHtml = '';
-  
+
   if (totalPages > 1) {
     controlsHtml = `
       <div style="display:flex;gap:8px;align-items:center;margin-top:8px;justify-content:center">
@@ -3351,7 +3348,7 @@ function updatePaginationControls(totalItems, currentItems) {
       </div>
     `;
   }
-  
+
   let existingControls = document.getElementById('pagination-controls');
   if (!existingControls) {
     existingControls = document.createElement('div');
@@ -3361,12 +3358,12 @@ function updatePaginationControls(totalItems, currentItems) {
   existingControls.innerHTML = controlsHtml;
 }
 
-window.nextPage = function() {
+window.nextPage = function () {
   currentPage++;
   fillNextPlayersTable(filteredPlayersList);
 }
 
-window.previousPage = function() {
+window.previousPage = function () {
   currentPage--;
   fillNextPlayersTable(filteredPlayersList);
 }
@@ -3457,7 +3454,7 @@ function viewSquads() {
   });
 }
 
-// Multiplayer functionality
+// Multiplayer functionality (Robust Socket.io)
 let socket = null;
 let currentRoomId = null;
 let isMultiplayer = false;
@@ -3466,31 +3463,34 @@ let selectedTeamsInRoom = [];
 let playersInRoom = [];
 let isRoomHost = false;
 
-// Initialize socket connection for production (Render)
+function updateServerStatus(message, color) {
+  const serverStatus = document.getElementById('serverStatus');
+  if (serverStatus) {
+    serverStatus.textContent = message;
+    serverStatus.style.color = color;
+  }
+}
+
 function initializeSocket() {
   if (socket && socket.connected) return;
-  
+
   if (socket) {
     socket.disconnect();
     socket = null;
   }
-  
-  // Production backend URL
-  const serverUrl = 'https://ipl-cca1.onrender.com';
-  
+
+  // Detect local vs production
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // Fallback to local 3000 if opened directly from file system
+  const isFile = window.location.protocol === 'file:';
+  const serverUrl = (isLocal || isFile) ? 'http://localhost:3000' : 'https://ipl-cca1.onrender.com';
+
   socket = io(serverUrl, {
     transports: ['websocket', 'polling'],
     upgrade: true,
-    rememberUpgrade: true,
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-    timeout: 20000,
-    forceNew: false,
     autoConnect: true
   });
-  
+
   updateServerStatus('🔄 Connecting...', '#ff8c00');
 
   socket.on('connect', () => {
@@ -3503,16 +3503,6 @@ function initializeSocket() {
     updateServerStatus('❌ Disconnected - Reconnecting...', '#f44336');
   });
 
-  socket.on('reconnect_attempt', (attempt) => {
-    console.log(`🔄 Reconnection attempt ${attempt}`);
-    updateServerStatus(`🔄 Reconnecting... (${attempt})`, '#ff8c00');
-  });
-
-  socket.on('reconnect', (attempt) => {
-    console.log(`✅ Reconnected after ${attempt} attempts`);
-    updateServerStatus('✅ Reconnected', '#4CAF50');
-  });
-
   socket.on('connect_error', (error) => {
     console.error('Connection error:', error.message);
     updateServerStatus('❌ Connection failed - Retrying...', '#f44336');
@@ -3521,66 +3511,58 @@ function initializeSocket() {
   setupSocketListeners();
 }
 
-function updateServerStatus(message, color) {
-  const serverStatus = document.getElementById('serverStatus');
-  if (serverStatus) {
-    serverStatus.textContent = message;
-    serverStatus.style.color = color;
-  }
-}
-
 function setupSocketListeners() {
   socket.on('roomCreated', (roomId) => {
     console.log('✅ Room created:', roomId);
-    
     currentRoomId = roomId;
     isRoomHost = true;
-    
-    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-    const roomCodeValue = document.getElementById('roomCodeValue');
-    const connectedCount = document.getElementById('connectedCount');
-    const enterBtn = document.getElementById('enterAuctionBtn');
-    
-    if (roomCodeValue) {
-      roomCodeValue.textContent = roomId;
-      console.log('✅ Room code displayed:', roomId);
-    }
-    
-    if (roomCodeDisplay) roomCodeDisplay.style.display = 'block';
-    if (connectedCount) connectedCount.textContent = '1 players connected';
-    if (enterBtn) enterBtn.style.display = 'block';
-    
-    showNotification(`Room Created: ${roomId}`, 'success');
     isMultiplayer = true;
+
     selectedTeamsInRoom = [];
     playersInRoom = [playerData];
+
+    document.getElementById('roomCodeDisplay').style.display = 'block';
+    document.getElementById('roomCodeValue').textContent = roomId;
+    document.getElementById('enterAuctionBtn').style.display = 'block';
+    showNotification(`Room Created: ${roomId}`, 'success');
   });
 
   socket.on('joinedRoom', (data) => {
     console.log('Successfully joined room:', data);
     currentRoomId = data.roomId;
     isRoomHost = false;
+    isMultiplayer = true;
     selectedTeamsInRoom = data.selectedTeams || [];
     playersInRoom = data.players || [];
-    document.getElementById('roomStatus').innerHTML = `
-      <div style="color:#4CAF50;font-weight:bold">Connected to Room: ${data.roomId}</div>
-      <div style="font-size:12px;color:var(--muted)">${data.players.length} player(s) connected</div>
-    `;
+
+    const rs = document.getElementById('joinStatus');
+    if (rs) {
+      rs.style.display = 'block';
+      rs.innerHTML = `
+        <div style="color:#4CAF50;font-weight:bold">Connected to Room: ${data.roomId}</div>
+      `;
+    }
+    const cc = document.getElementById('connectedCount');
+    if (cc) cc.textContent = `${playersInRoom.length} player(s) connected`;
+    document.getElementById('enterAuctionBtn').style.display = 'block';
     showNotification(`Joined Room: ${data.roomId}`, 'success');
-    isMultiplayer = true;
-    updateTeamDropdowns(); // Update dropdowns with already selected teams
+    updateTeamDropdowns();
   });
 
   socket.on('playerJoined', (data) => {
     console.log('Player joined room:', data);
-    playersInRoom = playersInRoom.filter(p => p.socketId !== data.player.socketId);
     playersInRoom.push(data.player);
-    
+
     if (currentRoomId) {
-      document.getElementById('roomStatus').innerHTML = `
-        <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
-        <div style="font-size:12px;color:var(--muted)">${data.playerCount} player(s) connected</div>
-      `;
+      const rs = document.getElementById('joinStatus');
+      if (rs) {
+        rs.style.display = 'block';
+        rs.innerHTML = `
+          <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
+        `;
+      }
+      const cc = document.getElementById('connectedCount');
+      if (cc) cc.textContent = `${data.playerCount} player(s) connected`;
     }
     showNotification(`${data.player.name || 'Player'} joined the room`, 'info');
   });
@@ -3589,46 +3571,40 @@ function setupSocketListeners() {
     console.log('Player left room:', data);
     playersInRoom = playersInRoom.filter(p => p.socketId !== data.playerId);
     selectedTeamsInRoom = data.selectedTeams || [];
-    
+
     if (currentRoomId) {
-      document.getElementById('roomStatus').innerHTML = `
-        <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
-        <div style="font-size:12px;color:var(--muted)">${data.playerCount} player(s) connected</div>
-      `;
+      const rs = document.getElementById('joinStatus');
+      if (rs) {
+        rs.style.display = 'block';
+        rs.innerHTML = `
+          <div style="color:#4CAF50;font-weight:bold">${isRoomHost ? 'Room' : 'Connected to Room'}: ${currentRoomId}</div>
+        `;
+      }
+      const cc = document.getElementById('connectedCount');
+      if (cc) cc.textContent = `${data.playerCount} player(s) connected`;
     }
     updateTeamDropdowns();
     showNotification('A player left the room', 'info');
   });
 
-  socket.on('teamSelected', (data) => {
-    console.log('Team selected by another player:', data);
-    selectedTeamsInRoom = data.selectedTeams || [];
-    
-    if (data.socketId !== socket.id) {
-      const playerName = data.playerInfo?.friendName || 'Another player';
-      showNotification(`${playerName} selected ${data.teamName}`, 'info');
-    }
-    
-    updateTeamDropdowns();
-  });
-
   socket.on('joinError', (error) => {
     console.error('Join error:', error);
-    
-    const joinStatus = document.getElementById('joinStatus');
-    if (joinStatus) {
-      joinStatus.style.display = 'block';
-      joinStatus.innerHTML = `<div style="color:#f44336">❌ ${error}</div>`;
-    }
-    
     showNotification(`Error: ${error}`, 'error');
     isMultiplayer = false;
     currentRoomId = null;
     isRoomHost = false;
   });
 
+  socket.on('teamSelected', (data) => {
+    selectedTeamsInRoom = data.selectedTeams || [];
+    if (data.socketId !== socket.id) {
+      const playerName = data.playerInfo?.friendName || 'Another player';
+      showNotification(`${playerName} selected ${data.teamName}`, 'info');
+    }
+    updateTeamDropdowns();
+  });
+
   socket.on('auctionStarted', (data) => {
-    console.log('Auction started:', data);
     if (data.teams) {
       teams = data.teams;
       currentPlayerIndex = data.gameState.currentPlayerIndex || 0;
@@ -3637,51 +3613,44 @@ function setupSocketListeners() {
       populateBidButtons();
       updateTeamsView();
       loadPlayer();
-      showNotification('Auction Started - All players can bid!', 'success');
+      showNotification('Auction Started!', 'success');
     }
   });
 
   socket.on('bidPlaced', (data) => {
-    console.log('Bid received:', data);
     currentPrice = data.bidAmount;
     highestBidderIdx = data.teamIndex;
     currentPriceEl.textContent = currentPrice;
     highestBidderEl.textContent = data.playerName;
-    
+
     countdown = NO_BID_SECONDS;
     timerEl.textContent = `${countdown}s`;
     startCountdownIfNeeded();
-    
+
     if (data.socketId !== socket.id) {
       showNotification(`${data.playerName} bid ₹${data.bidAmount} Cr`, 'info');
     }
   });
 
   socket.on('nextPlayer', (data) => {
-    console.log('Next player:', data);
     currentPlayerIndex = data.playerIndex;
     highestBidderIdx = -1;
-    
     if (timerInterval) {
       clearInterval(timerInterval);
       timerInterval = null;
     }
-    
     if (currentPlayerIndex < players.length) {
       loadPlayer();
-      showNotification('Next player loaded', 'info');
     } else {
-      showNotification('Auction completed!', 'success');
       showResult();
     }
   });
 
   socket.on('playerAssigned', (data) => {
-    console.log('Player assigned:', data);
     if (data.winningTeam && !data.skipped) {
       const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
       if (teamIndex !== -1) {
-        const playerExists = teams[teamIndex].players.some(p => 
+        const playerExists = teams[teamIndex].players.some(p =>
           (typeof p === 'string' ? p : p.name) === data.player.name
         );
         if (!playerExists) {
@@ -3694,238 +3663,181 @@ function setupSocketListeners() {
         updateLiveScoreboard();
       }
     }
-    
+
     auctionHistory.insertAdjacentHTML(
       "afterbegin",
       data.skipped ? `<li>❌ ${data.player.name} - UNSOLD</li>` :
-      `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} sold for ₹${data.price} Cr</li>`
+        `<li>✅ ${data.player.name} → ${data.winningTeam.teamName} sold for ₹${data.price} Cr</li>`
     );
   });
 }
 
-// Get user info and initialize socket
+function handleCreateRoom() {
+  const name = document.getElementById('hostName').value.trim();
+  if (!name) {
+    showNotification('Enter your name', 'error');
+    return;
+  }
+
+  if (!socket || !socket.connected) {
+    showNotification('Connecting to server...', 'info');
+    if (!socket) initializeSocket();
+    setTimeout(() => {
+      if (socket && socket.connected) {
+        socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() });
+      } else {
+        showNotification('Connection failed - Try again', 'error');
+      }
+    }, 2000);
+  } else {
+    socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || socket.id });
+  }
+}
+
+function handleJoinRoom() {
+  const name = document.getElementById('guestName').value.trim();
+  const code = document.getElementById('roomCodeInput').value.trim();
+  if (!name || !code) {
+    showNotification('Enter name and room code', 'error');
+    return;
+  }
+
+  if (!socket || !socket.connected) {
+    showNotification('Connecting...', 'info');
+    if (!socket) initializeSocket();
+    setTimeout(() => {
+      if (socket && socket.connected) {
+        socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() } });
+      } else {
+        showNotification('Connection failed - Try again', 'error');
+      }
+    }, 2000);
+  } else {
+    socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || socket.id } });
+  }
+}
+
+function enterAuction() {
+  document.getElementById('room-lobby').style.display = 'none';
+  document.getElementById('team-selection').style.display = 'block';
+  showNotification('Welcome to the auction!', 'success');
+}
+
+function copyRoomCode() {
+  const codeEl = document.getElementById('roomCodeValue');
+  if (!codeEl || !codeEl.textContent) return;
+  const code = codeEl.textContent.trim();
+  navigator.clipboard.writeText(code).then(() => {
+    showNotification(`Room code ${code} copied!`, 'success');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showNotification(`Copied: ${code}`, 'success');
+  });
+}
+
 function initializeMultiplayer() {
   const userInfo = localStorage.getItem('userInfo');
   if (userInfo) {
     playerData = JSON.parse(userInfo);
     initializeSocket();
+
+    // Auto-populate name inputs with Google Account name
+    const hostInput = document.getElementById('hostName');
+    if (hostInput && !hostInput.value) hostInput.value = playerData.name || '';
+
+    const guestInput = document.getElementById('guestName');
+    if (guestInput && !guestInput.value) guestInput.value = playerData.name || '';
   }
 }
 
-// Get buttons & input
-const createBtn = document.getElementById("createRoom");
-const joinBtn = document.getElementById("joinRoom");
-const roomInput = document.getElementById("roomId");
-
-// Create Room button click
-if (createBtn) {
-  createBtn.addEventListener("click", () => {
-    console.log('Create room clicked');
-    
-    if (!socket || !socket.connected) {
-      console.log('Socket not connected, initializing...');
-      showNotification('Connecting to server...', 'info');
-      
-      initializeSocket();
-      
-      // Wait for connection with multiple attempts
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      const waitForConnection = () => {
-        attempts++;
-        console.log(`Waiting for connection, attempt ${attempts}`);
-        
-        if (socket && socket.connected) {
-          console.log('Socket connected, creating room');
-          const userData = {
-            name: playerData?.name || 'Anonymous',
-            email: playerData?.email || '',
-            uid: playerData?.uid || Date.now()
-          };
-          socket.emit("createRoom", userData);
-        } else if (attempts < maxAttempts) {
-          setTimeout(waitForConnection, 1000);
-        } else {
-          showNotification('Connection timeout - Please try again', 'error');
-        }
-      };
-      
-      setTimeout(waitForConnection, 1000);
-    } else {
-      console.log('Socket already connected, creating room');
-      const userData = {
-        name: playerData?.name || 'Anonymous',
-        email: playerData?.email || '',
-        uid: playerData?.uid || socket.id
-      };
-      socket.emit("createRoom", userData);
-    }
-  });
-}
-
-// Join Room button click
-if (joinBtn) {
-  joinBtn.addEventListener("click", () => {
-    const id = roomInput.value.trim().toUpperCase();
-    if (!id) {
-      showNotification('Enter a Room ID to join!', 'error');
-      return;
-    }
-    
-    if (!socket || !socket.connected) {
-      showNotification('Connecting...', 'info');
-      initializeSocket();
-      
-      setTimeout(() => {
-        if (socket && socket.connected) {
-          const userData = {
-            name: playerData?.name || 'Anonymous',
-            email: playerData?.email || '',
-            uid: playerData?.uid || Date.now()
-          };
-          socket.emit("joinRoom", { roomId: id, userData });
-        } else {
-          showNotification('Connection failed - Try again', 'error');
-        }
-      }, 2000);
-    } else {
-      const userData = {
-        name: playerData?.name || 'Anonymous',
-        email: playerData?.email || '',
-        uid: playerData?.uid || socket.id
-      };
-      socket.emit("joinRoom", { roomId: id, userData });
-    }
-  });
-}
-
-// Notification system
-function showNotification(message, type = 'info') {
-  const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 50px;
-    right: 20px;
-    padding: 10px 15px;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    z-index: 1001;
-    max-width: 300px;
-    word-wrap: break-word;
-  `;
-  
-  switch(type) {
-    case 'success':
-      notification.style.backgroundColor = '#4CAF50';
-      break;
-    case 'error':
-      notification.style.backgroundColor = '#f44336';
-      break;
-    case 'info':
-    default:
-      notification.style.backgroundColor = '#2196F3';
-      break;
-  }
-  
-  notification.textContent = message;
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-  }, 3000);
-}
-
-// Initialize multiplayer when page loads
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     initializeMultiplayer();
-    // Force socket connection every 3 seconds until connected
-    const forceConnect = setInterval(() => {
-      if (!socket || !socket.connected) {
-        initializeSocket();
-      } else {
-        clearInterval(forceConnect);
-      }
-    }, 3000);
   }, 1000);
 });
 
+// Broadcast auction state changes
+window.updateAuctionUI = function () {
+  if (currentPlayerIndex < players.length) {
+    loadPlayer();
+  }
+  updateTeamsView();
+  updateLiveScoreboard();
+  populateBidButtons();
+};
 
+const originalBidNow = bidNow;
+bidNow = function (idx) {
+  originalBidNow(idx);
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    const t = teams[idx];
+    socket.emit('placeBid', {
+      roomId: currentRoomId,
+      bidAmount: currentPrice,
+      teamIndex: idx,
+      playerName: `${t.friendName} (${t.teamName})`
+    });
+  }
+};
 
+const originalAssignPlayer = assignPlayer;
+assignPlayer = function (skipped) {
+  const p = players[currentPlayerIndex];
+  const winningTeam = highestBidderIdx !== -1 ? teams[highestBidderIdx] : null;
+  const price = currentPrice;
 
+  originalAssignPlayer(skipped);
 
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    socket.emit('playerAssigned', {
+      roomId: currentRoomId,
+      player: p,
+      winningTeam: winningTeam,
+      price: price,
+      skipped: skipped
+    });
+  }
+};
 
-// UPDATE LIVE SCOREBOARD
-function updateLiveScoreboard() {
-  const board = document.getElementById("teamBoard");
-  if (!board) return;
-  
-  board.innerHTML = "";
-  teams.forEach(team => {
-    const shortName = TEAM_SHORT_NAMES[team.teamName] || team.teamName;
-    board.innerHTML += `
-      <div class="team-box">
-        ${shortName}<br>
-        ${team.friendName}<br>
-        Players: ${team.players.length}<br>
-        Points: ${team.totalPoints}
-      </div>
-    `;
-  });
-}
+document.getElementById('startAuctionBtn')?.addEventListener('click', () => {
+  if (isMultiplayer && isRoomHost && socket && socket.connected && currentRoomId) {
+    socket.emit('startAuction', {
+      roomId: currentRoomId,
+      teams: teams
+    });
+  }
+});
 
+let auctionEnded = false;
 
-
-/***********************
- * AUCTION STATE
- ***********************/
-let auctionEnded = false; // auction running by default
-
-/***********************
- * SHOW CURRENT STANDINGS
- ***********************/
 function showCurrentStandings() {
   auctionEnded = false;
   renderWinnerTable();
 }
 
-/***********************
- * CALL WHEN AUCTION ENDS
- * (points visible)
- ***********************/
 function showResult() {
-  auctionEnded = true; // ✅ THIS LINE reveals points
+  auctionEnded = true;
   renderWinnerTable();
 }
 
-/***********************
- * COMMON RENDER FUNCTION
- ***********************/
 function renderWinnerTable() {
   const winnerDiv = document.getElementById("winnerArea");
-  if (!winnerDiv) {
-    console.error("Winner area not found!");
-    return;
-  }
+  if (!winnerDiv) return;
 
   winnerDiv.style.display = "block";
-
-  const activeTeams = teams.filter(
-    t => t.players && t.players.length > 0
-  );
+  const activeTeams = teams.filter(t => t.players && t.players.length > 0);
 
   if (activeTeams.length === 0) {
     winnerDiv.innerHTML = "<p style='text-align:center; color:#ff8c00; font-size:18px;'>No teams have players yet. Start the auction first!</p>";
     return;
   }
 
-  const sorted = [...activeTeams].sort(
-    (a, b) => (b.totalPoints || 0) - (a.totalPoints || 0)
-  );
+  const sorted = [...activeTeams].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
 
   let html = `
     <h2 style="text-align:center; color:#ff8c00; margin:20px 0;">🏆 FINAL WINNER TABLE</h2>
@@ -3977,129 +3889,83 @@ function renderWinnerTable() {
   html += `
       </tbody>
     </table>
-
   `;
-  
+
   winnerDiv.innerHTML = html;
   winnerDiv.scrollIntoView({ behavior: "smooth" });
-  
-  console.log("Winner table rendered successfully!");
 }
 
+// Button overrides
+const hostNameInput = document.getElementById('hostName');
+if (hostNameInput) {
+  const createBtn = document.createElement('button');
+  createBtn.style.cssText = "width:100%; padding:12px; background:#f5c518; color:#111; border:none; cursor:pointer; border-radius:6px; font-weight:bold; font-size:15px;";
+  createBtn.textContent = '🎯 Create Room';
+  createBtn.onclick = handleCreateRoom;
 
-/* ═══════════════════════════════════════
-   ROOM INTEGRATION (PeerJS Multiplayer)
-═══════════════════════════════════════ */
-
-function handleCreateRoom() {
-  const name = document.getElementById('hostName').value.trim();
-  if (!name) { 
-    showNotification('Enter your name', 'error'); 
-    return; 
-  }
-  
-  if (!socket || !socket.connected) {
-    showNotification('Connecting to server...', 'info');
-    initializeSocket();
-    setTimeout(() => {
-      if (socket && socket.connected) {
-        socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() });
-      } else {
-        showNotification('Connection failed - Try again', 'error');
-      }
-    }, 2000);
+  // Replace if previously created by Firebase script
+  if (hostNameInput.nextElementSibling && hostNameInput.nextElementSibling.tagName === 'BUTTON') {
+    hostNameInput.parentNode.replaceChild(createBtn, hostNameInput.nextElementSibling);
   } else {
-    socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || socket.id });
+    hostNameInput.insertAdjacentElement('afterend', createBtn);
   }
 }
 
-function handleJoinRoom() {
-  const name = document.getElementById('guestName').value.trim();
-  const code = document.getElementById('roomCodeInput').value.trim();
-  if (!name || !code) { 
-    showNotification('Enter name and room code', 'error'); 
-    return; 
-  }
-  
-  if (!socket || !socket.connected) {
-    showNotification('Connecting...', 'info');
-    initializeSocket();
-    setTimeout(() => {
-      if (socket && socket.connected) {
-        socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || Date.now() } });
-      } else {
-        showNotification('Connection failed - Try again', 'error');
-      }
-    }, 2000);
+const roomCodeInput = document.getElementById('roomCodeInput');
+if (roomCodeInput) {
+  const joinBtn = document.createElement('button');
+  joinBtn.style.cssText = "width:100%; padding:12px; background:#3d7fff; color:white; border:none; cursor:pointer; border-radius:6px; font-weight:bold; font-size:15px;";
+  joinBtn.textContent = '🚀 Join Room';
+  joinBtn.onclick = handleJoinRoom;
+
+  if (roomCodeInput.nextElementSibling && roomCodeInput.nextElementSibling.tagName === 'BUTTON') {
+    roomCodeInput.parentNode.replaceChild(joinBtn, roomCodeInput.nextElementSibling);
   } else {
-    socket.emit("joinRoom", { roomId: code, userData: { name, email: playerData?.email || '', uid: playerData?.uid || socket.id } });
+    roomCodeInput.insertAdjacentElement('afterend', joinBtn);
   }
 }
 
-function enterAuction() {
-  document.getElementById('room-lobby').style.display = 'none';
-  document.getElementById('team-selection').style.display = 'block';
-  showNotification('Welcome to the auction!', 'success');
-}
+// Intercept select team logic
+const oUpdateTeamsObj = window.updateTeamsObj;
+window.updateTeamsObj = function () {
+  if (oUpdateTeamsObj) oUpdateTeamsObj();
 
-function copyRoomCode() {
-  const codeEl = document.getElementById('roomCodeValue');
-  if (!codeEl || !codeEl.textContent) return;
-  const code = codeEl.textContent.trim();
-  navigator.clipboard.writeText(code).then(() => {
-    showNotification(`Room code ${code} copied!`, 'success');
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = code;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showNotification(`Copied: ${code}`, 'success');
-  });
-}
-
-// Broadcast auction state changes (call this after important actions)
-function broadcastAuctionState() {
-  if (window.RoomManager && window.RoomManager.isHost()) {
-    const event = new CustomEvent('auctionStateChange', {
-      detail: {
-        teams,
-        currentPlayerIndex,
-        currentPrice,
-        highestBidderIdx,
+  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+    document.querySelectorAll('[id^="team-select-"]').forEach(sel => {
+      if (sel.value) {
+        socket.emit('selectTeam', {
+          roomId: currentRoomId,
+          teamName: sel.value,
+          playerInfo: { socketId: socket.id }
+        });
       }
     });
-    window.dispatchEvent(event);
   }
+};
+
+document.getElementById('declineBtn')?.addEventListener('click', () => {
+  if (isMultiplayer && isRoomHost && socket && socket.connected && currentRoomId) {
+    socket.emit('nextPlayer', {
+      roomId: currentRoomId,
+      playerIndex: currentPlayerIndex + 1
+    });
+  }
+});
+
+function updateLiveScoreboard() {
+  const board = document.getElementById("teamBoard");
+  if (!board) return;
+
+  board.innerHTML = "";
+  teams.forEach(team => {
+    const shortName = TEAM_SHORT_NAMES[team.teamName] || team.teamName;
+    board.innerHTML += `
+      <div class="team-box">
+        ${shortName}<br>
+        ${team.friendName}<br>
+        Players: ${team.players.length}<br>
+        Points: ${team.totalPoints}
+      </div>
+    `;
+  });
 }
-
-// Update UI when state syncs from host
-window.updateAuctionUI = function() {
-  if (currentPlayerIndex < players.length) {
-    loadPlayer();
-  }
-  updateTeamsView();
-  updateLiveScoreboard();
-  populateBidButtons();
-};
-
-// Override bidNow to broadcast in multiplayer
-const originalBidNow = bidNow;
-bidNow = function(idx) {
-  originalBidNow(idx);
-  if (typeof broadcastAuctionState === 'function') {
-    broadcastAuctionState();
-  }
-};
-
-// Override assignPlayer to broadcast in multiplayer
-const originalAssignPlayer = assignPlayer;
-assignPlayer = function(skipped) {
-  originalAssignPlayer(skipped);
-  if (typeof broadcastAuctionState === 'function') {
-    broadcastAuctionState();
-  }
-};
-
-console.log('Room integration loaded successfully');
