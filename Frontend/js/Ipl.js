@@ -3463,6 +3463,55 @@ let selectedTeamsInRoom = [];
 let playersInRoom = [];
 let isRoomHost = false;
 
+function showNotification(message, type = 'info') {
+  let container = document.getElementById('notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notification-container';
+    container.style.position = 'fixed';
+    container.style.top = '20px';
+    container.style.right = '20px';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+  }
+
+  const notif = document.createElement('div');
+  notif.textContent = message;
+  notif.style.padding = '12px 24px';
+  notif.style.marginTop = '10px';
+  notif.style.borderRadius = '8px';
+  notif.style.color = '#fff';
+  notif.style.fontFamily = 'sans-serif';
+  notif.style.fontWeight = 'bold';
+  notif.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+  notif.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+  notif.style.transform = 'translateY(-20px)';
+  notif.style.opacity = '0';
+
+  if (type === 'success') {
+    notif.style.backgroundColor = '#4CAF50';
+  } else if (type === 'error') {
+    notif.style.backgroundColor = '#f44336';
+  } else {
+    notif.style.backgroundColor = '#2196F3';
+  }
+
+  container.appendChild(notif);
+
+  setTimeout(() => {
+    notif.style.transform = 'translateY(0)';
+    notif.style.opacity = '1';
+  }, 10);
+
+  setTimeout(() => {
+    notif.style.opacity = '0';
+    notif.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+      if (container.contains(notif)) container.removeChild(notif);
+    }, 400);
+  }, 3000);
+}
+
 function updateServerStatus(message, color) {
   const serverStatus = document.getElementById('serverStatus');
   if (serverStatus) {
