@@ -2625,6 +2625,7 @@ let currentPrice = 0;
 let highestBidderIdx = -1; // index into teams array, -1 means no bids yet
 const priceIncrement = 1; // 1 Cr per click (manual)
 let timerInterval = null;
+let isTransitioning = false;
 const NO_BID_SECONDS = 10; // <-- changed to 10s
 let countdown = NO_BID_SECONDS;
 
@@ -3001,6 +3002,7 @@ function escapeHtml(s) {
 
 /* ====== Load current player (no auto-increment here) ====== */
 function loadPlayer() {
+  isTransitioning = false;
   if (currentPlayerIndex >= players.length) {
     alert("Auction finished for provided players.");
     highestBidderEl.textContent = "-";
@@ -3019,7 +3021,7 @@ function loadPlayer() {
   currentPriceEl.textContent = currentPrice;
   highestBidderEl.textContent = "-";
 
-  // reset countdown display, but DO NOT start timer until first bid
+  // reset countdown display and START timer immediately
   countdown = NO_BID_SECONDS;
   timerEl.textContent = `${countdown}s`;
 
@@ -3028,12 +3030,13 @@ function loadPlayer() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
+  startCountdownIfNeeded();
 
   // refresh next players list on load
   filterPlayers();
 }
 
-/* ====== Helper: start countdown timer (starts only after first bid) ====== */
+/* ====== Helper: start countdown timer ====== */
 function startCountdownIfNeeded() {
   if (timerInterval) return; // already running
   timerInterval = setInterval(() => {
@@ -3044,13 +3047,16 @@ function startCountdownIfNeeded() {
       clearInterval(timerInterval);
       timerInterval = null;
       // if there is a highest bidder, finalize sale; otherwise mark unsold
-      assignPlayer(false);
+      if (!isMultiplayer || isRoomHost) {
+        assignPlayer(highestBidderIdx === -1);
+      }
     }
   }, 1000);
 }
 
 /* ====== Bid Now handler (manual increment) ====== */
 function bidNow(idx) {
+  if (isTransitioning) return;
   const t = teams[idx];
   const p = players[currentPlayerIndex];
 
@@ -3113,6 +3119,8 @@ function declineNow() {
 
 /* ====== Assign player to highest bidder or mark unsold ====== */
 function assignPlayer(skipped = false) {
+  isTransitioning = true;
+  timerEl.textContent = skipped ? "UNSOLD" : "SOLD!";
   const p = players[currentPlayerIndex];
   let winningTeam = null;
 
@@ -3186,13 +3194,14 @@ function assignPlayer(skipped = false) {
   // Auto move to next player (only in single player mode)
   if (!isMultiplayer) {
     setTimeout(() => {
+      isTransitioning = false;
       if (currentPlayerIndex < players.length) {
         loadPlayer();
       } else {
         showNotification("Auction completed for all players in the list.", 'success');
         showResult();
       }
-    }, 1000);
+    }, 3000);
   }
 }
 
@@ -3696,6 +3705,8 @@ function setupSocketListeners() {
   });
 
   socket.on('playerAssigned', (data) => {
+    if (isRoomHost) return; // host already processed this synchronously
+
     if (data.winningTeam && !data.skipped) {
       const teamIndex = teams.findIndex(t => t.teamName === data.winningTeam.teamName);
       if (teamIndex !== -1) {
@@ -3738,7 +3749,8 @@ function handleCreateRoom() {
         showNotification('Connection failed - Try again', 'error');
       }
     }, 2000);
-  } else {
+  }
+  else {
     socket.emit("createRoom", { name, email: playerData?.email || '', uid: playerData?.uid || socket.id });
   }
 }
@@ -3822,6 +3834,7 @@ window.updateAuctionUI = function () {
 
 const originalBidNow = bidNow;
 bidNow = function (idx) {
+  if (isTransitioning) return;
   originalBidNow(idx);
   if (isMultiplayer && socket && socket.connected && currentRoomId) {
     const t = teams[idx];
@@ -3842,7 +3855,7 @@ assignPlayer = function (skipped) {
 
   originalAssignPlayer(skipped);
 
-  if (isMultiplayer && socket && socket.connected && currentRoomId) {
+  if (isMultiplayer && isRoomHost && socket && socket.connected && currentRoomId) {
     socket.emit('playerAssigned', {
       roomId: currentRoomId,
       player: p,
@@ -3850,6 +3863,14 @@ assignPlayer = function (skipped) {
       price: price,
       skipped: skipped
     });
+
+    // Auto next player for multiplayer (host drives it)
+    setTimeout(() => {
+      socket.emit('nextPlayer', {
+        roomId: currentRoomId,
+        playerIndex: currentPlayerIndex
+      });
+    }, 3000);
   }
 };
 
@@ -3991,15 +4012,6 @@ window.updateTeamsObj = function () {
     });
   }
 };
-
-document.getElementById('declineBtn')?.addEventListener('click', () => {
-  if (isMultiplayer && isRoomHost && socket && socket.connected && currentRoomId) {
-    socket.emit('nextPlayer', {
-      roomId: currentRoomId,
-      playerIndex: currentPlayerIndex + 1
-    });
-  }
-});
 
 function updateLiveScoreboard() {
   const board = document.getElementById("teamBoard");
